@@ -33,7 +33,7 @@ export const ExerciseSwapModal: React.FC<ExerciseSwapModalProps> = ({
         <div className={styles.header}>
           <div className={styles.titleArea}>
             <div className={styles.title}>
-              <ArrowLeftRight size={20} color="var(--accent-cyan)" />
+              <ArrowLeftRight size={20} color="var(--accent-amber)" />
               <span>Equipment Busy? Swap Exercise</span>
             </div>
             <div className={styles.currentBadge}>
@@ -59,9 +59,9 @@ export const ExerciseSwapModal: React.FC<ExerciseSwapModalProps> = ({
                     {exercise.equipment}
                   </div>
                 </div>
-                <div style={{ display: 'flex', gap: 4 }}>
-                  <span className="badge badge-cyan">{exercise.category}</span>
-                  <span className="badge badge-volt">SFR {exercise.sfrTier}</span>
+                <div style={{ display: 'flex', gap: 6 }}>
+                  <span className="badge badge-amber">{exercise.category}</span>
+                  <span className="badge badge-muted">{exercise.equipment}</span>
                 </div>
               </div>
 

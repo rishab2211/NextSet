@@ -191,6 +191,12 @@ button {
   border: 1px solid rgba(16, 185, 129, 0.25);
 }
 
+.badge-muted {
+  background: var(--surface-2);
+  color: var(--text-muted);
+  border: 1px solid var(--border-subtle);
+}
+
 /* Animations */
 @keyframes slideUpDrawer {
   from {
