@@ -3,7 +3,8 @@
 import React from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../lib/db';
-import { Calendar, Dumbbell, Award } from 'lucide-react';
+import { getExerciseById } from '../data/exercises';
+import { Calendar, Dumbbell, Award, Clock } from 'lucide-react';
 import styles from './WorkoutHistory.module.css';
 
 export const WorkoutHistory: React.FC = () => {
@@ -45,12 +46,24 @@ export const WorkoutHistory: React.FC = () => {
     return `${mins} min`;
   };
 
-  const getSessionStats = (sessionId: string) => {
+  const getSessionDetails = (sessionId: string) => {
     const sessionSets = sets.filter((s) => s.session_id === sessionId);
-    const totalVolume = sessionSets.reduce((sum, s) => sum + s.weight_value * s.reps, 0);
+    const exerciseIds = Array.from(new Set(sessionSets.map((s) => s.exercise_id)));
+    const exerciseSummaries = exerciseIds.map((exId) => {
+      const ex = getExerciseById(exId);
+      const exSets = sessionSets.filter((s) => s.exercise_id === exId);
+      const topWeight = Math.max(...exSets.map((s) => s.weight_value), 0);
+      const unit = exSets[0]?.weight_unit || 'kg';
+      return {
+        name: ex ? ex.name : exId,
+        setCount: exSets.length,
+        topWeight: topWeight > 0 ? `${topWeight}${unit}` : null,
+      };
+    });
+
     return {
       setCount: sessionSets.length,
-      volumeKg: Math.round(totalVolume),
+      exercises: exerciseSummaries,
     };
   };
 
@@ -71,40 +84,41 @@ export const WorkoutHistory: React.FC = () => {
           }}
         >
           <Award size={48} color="var(--border-strong)" />
-          <h3>No Completed Workouts Yet</h3>
-          <p style={{ fontSize: 'var(--font-sm)' }}>
-            Start an active workout session from the main screen to log your lifts and track progressive overload.
+          <h3 style={{ color: 'var(--text-primary)', fontSize: 'var(--font-lg)' }}>No Completed Workouts Yet</h3>
+          <p style={{ fontSize: 'var(--font-sm)', color: 'var(--text-muted)' }}>
+            Start a workout session from the main screen to log your sets and build your training log.
           </p>
         </div>
       ) : (
         <div className={styles.historyList}>
           {completedSessions.map((session) => {
-            const stats = getSessionStats(session.id);
+            const details = getSessionDetails(session.id);
             return (
               <div key={session.id} className={styles.card}>
                 <div className={styles.cardHeader}>
-                  <div className={styles.workoutTitle}>{session.title}</div>
-                  <div className={styles.dateBadge}>{formatDate(session.started_at)}</div>
-                </div>
-
-                <div className={styles.statsGrid}>
-                  <div className={styles.statItem}>
-                    <div className={styles.statLabel}>Duration</div>
-                    <div className={styles.statValue}>
-                      {getDurationMinutes(session.started_at, session.ended_at)}
-                    </div>
+                  <div>
+                    <div className={styles.workoutTitle}>{session.title}</div>
+                    <div className={styles.dateBadge}>{formatDate(session.started_at)}</div>
                   </div>
-
-                  <div className={styles.statItem}>
-                    <div className={styles.statLabel}>Completed Sets</div>
-                    <div className={styles.statValue}>{stats.setCount}</div>
-                  </div>
-
-                  <div className={styles.statItem}>
-                    <div className={styles.statLabel}>Total Volume</div>
-                    <div className={styles.statValue}>{stats.volumeKg.toLocaleString()} kg</div>
+                  <div className={styles.durationPill}>
+                    <Clock size={12} />
+                    <span>{getDurationMinutes(session.started_at, session.ended_at)}</span>
                   </div>
                 </div>
+
+                {/* Exercises performed breakdown */}
+                {details.exercises.length > 0 && (
+                  <div className={styles.exerciseTagsList}>
+                    {details.exercises.map((item, idx) => (
+                      <div key={idx} className={styles.exerciseItemRow}>
+                        <span className={styles.exerciseNameText}>{item.name}</span>
+                        <span className={styles.exerciseMetaText}>
+                          {item.setCount} sets {item.topWeight ? `· Top: ${item.topWeight}` : ''}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             );
           })}

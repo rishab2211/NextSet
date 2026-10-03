@@ -1,5 +1,5 @@
 import { db } from './index';
-import { getEffectiveUserId } from '../auth/authStore';
+import { getEffectiveUserId, getUnitPreference } from '../auth/authStore';
 import type { WorkoutSession, WorkoutSet, SetType, WeightUnit } from '@kinetic/shared';
 
 // Safe UUID generation fallback for environments without crypto.randomUUID
@@ -125,7 +125,7 @@ export async function addWorkoutSet(params: {
     set_number: params.setNumber,
     set_type: params.setType || 'working',
     weight_value: params.weightValue,
-    weight_unit: params.weightUnit || 'kg',
+    weight_unit: params.weightUnit || getUnitPreference(),
     reps: params.reps,
     rpe: params.rpe,
     completed: true,

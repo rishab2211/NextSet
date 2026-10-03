@@ -12,15 +12,9 @@
 }
 
 .rowCompleted {
-  background: rgba(16, 185, 129, 0.08);
-  border-color: rgba(16, 185, 129, 0.25);
-  animation: snapPulse 180ms ease-out;
-}
-
-@keyframes snapPulse {
-  0% { transform: scale(0.97); }
-  60% { transform: scale(1.02); }
-  100% { transform: scale(1); }
+  background: var(--success-subtle);
+  border-color: rgba(16, 185, 129, 0.35);
+  animation: setCompleteSnap 160ms ease-out;
 }
 
 .setIndicator {
@@ -43,20 +37,13 @@
   position: absolute;
   top: -8px;
   right: -8px;
-  background: linear-gradient(135deg, #f59e0b, #d97706);
+  background: var(--warning);
   color: #000000;
   font-size: 8px;
   font-weight: 900;
   padding: 1px 3px;
-  border-radius: 4px;
-  box-shadow: 0 0 8px rgba(245, 158, 11, 0.6);
-  animation: prGlow 1.5s infinite alternate;
+  border-radius: 3px;
   letter-spacing: -0.02em;
-}
-
-@keyframes prGlow {
-  from { transform: scale(0.95); box-shadow: 0 0 4px rgba(245, 158, 11, 0.3); }
-  to { transform: scale(1.05); box-shadow: 0 0 10px rgba(245, 158, 11, 0.7); }
 }
 
 .setTypeWarmup {
@@ -76,6 +63,33 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  user-select: none;
+}
+
+.prevPerfActionable {
+  cursor: pointer;
+  color: var(--text-secondary);
+  text-decoration: underline dotted var(--border-strong);
+}
+
+.prevPerfActionable:hover {
+  color: var(--accent-primary);
+}
+
+.copyBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent-primary);
+  opacity: 0.8;
+}
+
+.weightCellGroup {
+  display: flex;
+  align-items: center;
 }
 
 .valuePill {
@@ -84,6 +98,7 @@
   justify-content: center;
   gap: 2px;
   height: 38px;
+  width: 100%;
   background: var(--bg-secondary);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-sm);
@@ -99,10 +114,15 @@
 
 .valuePill:active {
   background: var(--bg-elevated);
-  border-color: var(--accent-cyan);
+  border-color: var(--border-strong);
 }
 
 .valuePillEmpty {
+  color: var(--text-muted);
+}
+
+.unitText {
+  font-size: 10px;
   color: var(--text-muted);
 }
 
@@ -121,12 +141,11 @@
 }
 
 .checkBtn:active {
-  transform: scale(0.9);
+  transform: scale(0.92);
 }
 
 .checkBtnCompleted {
   background: var(--success);
   border-color: var(--success);
   color: #ffffff;
-  box-shadow: 0 0 12px var(--success-glow);
 }

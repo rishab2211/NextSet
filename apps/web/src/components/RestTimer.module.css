@@ -5,18 +5,16 @@
   transform: translateX(-50%);
   width: calc(100% - 32px);
   max-width: 440px;
-  background: rgba(17, 20, 26, 0.92);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  background: var(--bg-elevated);
   border: 1px solid var(--border-medium);
-  border-radius: var(--radius-xl);
+  border-radius: var(--radius-lg);
   padding: var(--space-3) var(--space-4);
-  box-shadow: 0 10px 35px rgba(0, 0, 0, 0.75), var(--shadow-glow-cyan);
+  box-shadow: var(--shadow-lg);
   z-index: var(--z-dock);
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
-  animation: slideUp 200ms ease-out;
+  animation: slideUp 180ms ease-out;
 }
 
 @keyframes slideUp {
@@ -39,16 +37,16 @@
 .timerLabel {
   font-size: var(--font-xs);
   text-transform: uppercase;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.05em;
   color: var(--text-secondary);
   font-weight: 700;
 }
 
 .countdownDisplay {
   font-family: var(--font-mono);
-  font-size: var(--font-3xl);
+  font-size: var(--font-2xl);
   font-weight: 800;
-  color: var(--accent-cyan);
+  color: var(--accent-primary);
   line-height: 1;
 }
 
@@ -59,34 +57,38 @@
 }
 
 .adjustBtn {
+  height: 32px;
+  padding: 0 10px;
   background: var(--bg-tertiary);
   border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
   color: var(--text-primary);
   font-family: var(--font-mono);
-  font-weight: 700;
   font-size: var(--font-xs);
-  padding: 6px 10px;
-  border-radius: var(--radius-sm);
+  font-weight: 700;
   transition: all var(--transition-fast);
 }
 
 .adjustBtn:active {
-  background: var(--bg-elevated);
+  background: var(--bg-secondary);
   transform: scale(0.95);
 }
 
 .skipBtn {
-  background: var(--bg-elevated);
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-tertiary);
   border: 1px solid var(--border-subtle);
-  color: var(--text-secondary);
-  font-size: var(--font-xs);
-  font-weight: 600;
-  padding: 6px 12px;
   border-radius: var(--radius-sm);
+  color: var(--text-secondary);
   transition: all var(--transition-fast);
 }
 
 .skipBtn:active {
+  background: var(--bg-secondary);
   color: var(--text-primary);
   transform: scale(0.95);
 }
@@ -101,6 +103,7 @@
 
 .progressFill {
   height: 100%;
-  background: linear-gradient(90deg, var(--accent-cyan), var(--accent-volt));
-  transition: width 1s linear;
+  background: var(--accent-primary);
+  border-radius: var(--radius-full);
+  transition: width 400ms linear;
 }

@@ -8,18 +8,18 @@
 .header {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 2px;
 }
 
 .title {
-  font-size: var(--font-2xl);
-  font-weight: 800;
+  font-size: var(--font-xl);
+  font-weight: 700;
   color: var(--text-primary);
-  letter-spacing: -0.02em;
+  letter-spacing: -0.01em;
 }
 
 .subtitle {
-  font-size: var(--font-sm);
+  font-size: var(--font-xs);
   color: var(--text-secondary);
 }
 
@@ -29,7 +29,7 @@
   gap: var(--space-2);
   background: var(--bg-secondary);
   border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-sm);
   padding: 0 var(--space-3);
   height: 44px;
 }
@@ -40,6 +40,7 @@
   border: none;
   color: var(--text-primary);
   font-size: var(--font-sm);
+  font-family: inherit;
   outline: none;
 }
 
@@ -54,44 +55,42 @@
   padding: 6px 14px;
   border-radius: var(--radius-full);
   font-size: var(--font-xs);
-  font-weight: 700;
+  font-weight: 600;
   text-transform: capitalize;
   background: var(--bg-secondary);
   color: var(--text-secondary);
   border: 1px solid var(--border-subtle);
   white-space: nowrap;
+  transition: all var(--transition-fast);
 }
 
 .categoryBtnActive {
-  background: var(--accent-cyan);
-  color: var(--text-inverse);
-  border-color: var(--accent-cyan);
+  background: var(--accent-primary);
+  color: #ffffff;
+  border-color: var(--accent-primary);
 }
 
 .grid {
   display: flex;
   flex-direction: column;
-  gap: var(--space-3);
+  gap: var(--space-2);
 }
 
 .card {
   background: var(--bg-secondary);
   border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-lg);
-  padding: var(--space-4);
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
   display: flex;
   flex-direction: column;
-  gap: var(--space-3);
+  gap: var(--space-2);
   cursor: pointer;
   transition: all var(--transition-fast);
 }
 
-.card:hover {
-  border-color: var(--border-medium);
-}
-
 .card:active {
-  transform: scale(0.98);
+  background: var(--bg-tertiary);
+  border-color: var(--border-medium);
 }
 
 .cardTop {
@@ -109,15 +108,15 @@
 .cardMeta {
   font-size: var(--font-xs);
   color: var(--text-muted);
-  margin-top: 2px;
+  text-transform: capitalize;
 }
 
 .cardFooter {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-top: 1px solid var(--border-subtle);
   padding-top: var(--space-2);
+  border-top: 1px solid var(--border-subtle);
 }
 
 .targetTags {
@@ -127,10 +126,11 @@
 }
 
 .targetTag {
-  font-size: 11px;
-  padding: 2px 8px;
-  border-radius: var(--radius-sm);
+  font-size: 10px;
   background: var(--bg-tertiary);
+  border: 1px solid var(--border-subtle);
+  padding: 2px 6px;
+  border-radius: var(--radius-xs);
   color: var(--text-secondary);
   text-transform: capitalize;
 }
@@ -138,8 +138,8 @@
 .learnCuesBtn {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 2px;
   font-size: var(--font-xs);
-  font-weight: 700;
-  color: var(--accent-cyan);
+  font-weight: 600;
+  color: var(--accent-primary);
 }

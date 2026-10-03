@@ -1,9 +1,9 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import type { ExerciseGuide } from '@kinetic/shared';
 import { MuscleMap } from './MuscleMap';
-import { X, AlertTriangle, CheckCircle2, Dumbbell, Zap } from 'lucide-react';
+import { X, AlertTriangle, Check, Dumbbell, ChevronDown, ChevronUp } from 'lucide-react';
 import styles from './ExerciseModal.module.css';
 
 interface ExerciseModalProps {
@@ -19,6 +19,8 @@ export const ExerciseModal: React.FC<ExerciseModalProps> = ({
   onAddToWorkout,
   inActiveWorkout = false,
 }) => {
+  const [showAnatomyMap, setShowAnatomyMap] = useState<boolean>(false);
+
   if (!exercise) return null;
 
   return (
@@ -27,8 +29,10 @@ export const ExerciseModal: React.FC<ExerciseModalProps> = ({
         <div className={styles.header}>
           <div className={styles.titleArea}>
             <div className={styles.badges}>
-              <span className="badge badge-cyan">{exercise.category}</span>
-              <span className="badge badge-volt">SFR {exercise.sfrTier}-Tier</span>
+              <span className="badge badge-amber">{exercise.category}</span>
+              <span style={{ fontSize: 'var(--font-xs)', color: 'var(--text-secondary)' }}>
+                {exercise.primaryMuscles.join(', ')}
+              </span>
             </div>
             <h2 className={styles.title}>{exercise.name}</h2>
           </div>
@@ -38,44 +42,27 @@ export const ExerciseModal: React.FC<ExerciseModalProps> = ({
         </div>
 
         <div className={styles.content}>
-          {/* Quick Scientific Metrics */}
+          {/* Practical Workout Guidance */}
           <div className={styles.metricsGrid}>
-            <div className={styles.metricCard}>
-              <div className={styles.metricLabel}>Axial Fatigue</div>
-              <div className={styles.metricValue}>{exercise.fatigueIndex} / 5</div>
-            </div>
             <div className={styles.metricCard}>
               <div className={styles.metricLabel}>Rep Range</div>
               <div className={styles.metricValue}>
-                {exercise.recommendedRepRange.min} - {exercise.recommendedRepRange.max}
+                {exercise.recommendedRepRange.min} - {exercise.recommendedRepRange.max} reps
               </div>
             </div>
             <div className={styles.metricCard}>
               <div className={styles.metricLabel}>Equipment</div>
-              <div className={styles.metricValue} style={{ fontSize: '11px', textTransform: 'capitalize' }}>
-                {exercise.equipment.split(' ')[0]}
+              <div className={styles.metricValue} style={{ textTransform: 'capitalize' }}>
+                {exercise.equipment.split('&')[0].trim()}
               </div>
             </div>
-          </div>
-
-          {/* Interactive Muscle Activation Map */}
-          <div className={styles.anatomySection}>
-            <div className={styles.sectionHeading}>
-              <Zap size={16} color="var(--accent-cyan)" />
-              Target Musculature & Activation
-            </div>
-            <MuscleMap
-              primaryMuscles={exercise.primaryMuscles}
-              secondaryMuscles={exercise.secondaryMuscles}
-              interactive={false}
-            />
           </div>
 
           {/* Setup Instructions */}
           <div className={styles.anatomySection}>
             <div className={styles.sectionHeading}>
-              <Dumbbell size={16} color="var(--accent-cyan)" />
-              Setup & Posture Checklist
+              <Dumbbell size={16} color="var(--accent-primary)" />
+              <span>Setup Checklist</span>
             </div>
             <ol className={styles.stepList}>
               {exercise.setupSteps.map((step, idx) => (
@@ -87,11 +74,11 @@ export const ExerciseModal: React.FC<ExerciseModalProps> = ({
             </ol>
           </div>
 
-          {/* Execution & Biomechanics */}
+          {/* Execution & Tension Cues */}
           <div className={styles.anatomySection}>
             <div className={styles.sectionHeading}>
-              <CheckCircle2 size={16} color="var(--success)" />
-              Execution & Tension Cues
+              <Check size={16} color="var(--success)" />
+              <span>Execution Cues</span>
             </div>
             <ol className={styles.stepList}>
               {exercise.executionSteps.map((step, idx) => (
@@ -103,11 +90,11 @@ export const ExerciseModal: React.FC<ExerciseModalProps> = ({
             </ol>
           </div>
 
-          {/* Common Form Mistakes & Critical Fixes */}
+          {/* Common Mistakes */}
           <div className={styles.anatomySection}>
             <div className={styles.sectionHeading}>
               <AlertTriangle size={16} color="var(--danger)" />
-              Common Mistakes to Avoid
+              <span>Common Mistakes & Fixes</span>
             </div>
             <div className={styles.stepList}>
               {exercise.commonMistakes.map((item, idx) => (
@@ -122,6 +109,28 @@ export const ExerciseModal: React.FC<ExerciseModalProps> = ({
                 </div>
               ))}
             </div>
+          </div>
+
+          {/* Progressive Disclosure: Collapsible Anatomy Map */}
+          <div className={styles.accordionContainer}>
+            <button
+              type="button"
+              className={styles.accordionToggle}
+              onClick={() => setShowAnatomyMap(!showAnatomyMap)}
+            >
+              <span>Target Musculature Diagram</span>
+              {showAnatomyMap ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+            </button>
+
+            {showAnatomyMap && (
+              <div style={{ paddingTop: 12 }}>
+                <MuscleMap
+                  primaryMuscles={exercise.primaryMuscles}
+                  secondaryMuscles={exercise.secondaryMuscles}
+                  interactive={false}
+                />
+              </div>
+            )}
           </div>
         </div>
 

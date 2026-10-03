@@ -4,13 +4,12 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.82);
-  backdrop-filter: blur(10px);
+  background: rgba(0, 0, 0, 0.75);
   z-index: var(--z-modal-backdrop);
   display: flex;
   align-items: flex-end;
   justify-content: center;
-  animation: fadeIn 180ms ease-out;
+  animation: fadeIn 150ms ease-out;
 }
 
 @keyframes fadeIn {
@@ -24,12 +23,12 @@
   max-height: 90vh;
   background: var(--bg-secondary);
   border: 1px solid var(--border-medium);
-  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.7);
-  animation: slideUp 240ms cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: var(--shadow-lg);
+  animation: slideUp 200ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @keyframes slideUp {
@@ -53,7 +52,7 @@
 }
 
 .title {
-  font-size: var(--font-xl);
+  font-size: var(--font-lg);
   font-weight: 700;
   color: var(--text-primary);
   line-height: 1.2;
@@ -66,15 +65,14 @@
 }
 
 .closeBtn {
-  width: 40px;
-  height: 40px;
-  border-radius: var(--radius-full);
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-sm);
   display: flex;
   align-items: center;
   justify-content: center;
   background: var(--bg-elevated);
   color: var(--text-secondary);
-  font-size: 20px;
   border: 1px solid var(--border-subtle);
   transition: all var(--transition-fast);
 }
@@ -85,11 +83,11 @@
 }
 
 .content {
-  padding: var(--space-5);
+  padding: var(--space-4) var(--space-5);
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: var(--space-6);
+  gap: var(--space-5);
 }
 
 .anatomySection {
@@ -99,11 +97,11 @@
 }
 
 .sectionHeading {
-  font-size: var(--font-sm);
+  font-size: var(--font-xs);
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: var(--text-secondary);
+  color: var(--text-muted);
   display: flex;
   align-items: center;
   gap: var(--space-2);
@@ -112,7 +110,7 @@
 .stepList {
   display: flex;
   flex-direction: column;
-  gap: var(--space-3);
+  gap: var(--space-2);
   list-style: none;
 }
 
@@ -120,29 +118,29 @@
   display: flex;
   gap: var(--space-3);
   font-size: var(--font-sm);
-  line-height: 1.5;
+  line-height: 1.45;
   color: var(--text-primary);
   background: var(--bg-tertiary);
   padding: var(--space-3) var(--space-4);
-  border-radius: var(--radius-md);
-  border-left: 3px solid var(--accent-cyan);
+  border-radius: var(--radius-sm);
+  border-left: 3px solid var(--accent-primary);
 }
 
 .stepNumber {
   font-family: var(--font-mono);
   font-weight: 700;
-  color: var(--accent-cyan);
-  min-width: 18px;
+  color: var(--accent-primary);
+  min-width: 16px;
 }
 
 .mistakeCard {
   background: rgba(239, 68, 68, 0.06);
   border: 1px solid rgba(239, 68, 68, 0.2);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-sm);
   padding: var(--space-3) var(--space-4);
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
 }
 
 .mistakeText {
@@ -164,14 +162,14 @@
 
 .metricsGrid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: var(--space-2);
 }
 
 .metricCard {
   background: var(--bg-tertiary);
   padding: var(--space-3);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-sm);
   text-align: center;
   border: 1px solid var(--border-subtle);
 }
@@ -184,11 +182,34 @@
 }
 
 .metricValue {
-  font-size: var(--font-base);
+  font-size: var(--font-sm);
   font-weight: 700;
   color: var(--text-primary);
   font-family: var(--font-mono);
   margin-top: 2px;
+}
+
+.accordionContainer {
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: var(--space-3);
+  background: var(--bg-tertiary);
+}
+
+.accordionToggle {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: var(--font-xs);
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.accordionToggle:hover {
+  color: var(--text-primary);
 }
 
 .ctaFooter {

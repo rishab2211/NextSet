@@ -3,7 +3,7 @@
 import React from 'react';
 import type { WorkoutSet, SetType } from '@kinetic/shared';
 import type { NumpadMode } from './Numpad';
-import { Check } from 'lucide-react';
+import { Check, Copy } from 'lucide-react';
 import styles from './SetRow.module.css';
 
 interface SetRowProps {
@@ -15,7 +15,8 @@ interface SetRowProps {
     mode: NumpadMode,
     initialValue: number,
     unit: string,
-    callback: (val: number) => void
+    callback: (val: number) => void,
+    prevValue?: number
   ) => void;
   onOpenPlateCalculator?: (
     initialWeight: number,
@@ -58,6 +59,21 @@ export const SetRow: React.FC<SetRowProps> = ({
     return `${previousSet.weight_value}${previousSet.weight_unit} × ${previousSet.reps}`;
   };
 
+  const handleCopyPrevious = () => {
+    if (!previousSet) return;
+    onUpdate(set.id, {
+      weight_value: previousSet.weight_value,
+      weight_unit: previousSet.weight_unit,
+      reps: previousSet.reps,
+    });
+  };
+
+  const handleAdjustWeight = (delta: number) => {
+    const base = set.weight_value > 0 ? set.weight_value : (previousSet ? previousSet.weight_value : 0);
+    const next = Math.max(0, Number((base + delta).toFixed(2)));
+    onUpdate(set.id, { weight_value: next });
+  };
+
   return (
     <div className={`${styles.row} ${set.completed ? styles.rowCompleted : ''}`}>
       {/* Set Number / Type Toggle Button */}
@@ -67,43 +83,68 @@ export const SetRow: React.FC<SetRowProps> = ({
           set.set_type === 'warmup' ? styles.setTypeWarmup : set.set_type === 'drop' ? styles.setTypeDrop : ''
         }`}
         onClick={cycleSetType}
-        title="Tap to change set type (Working / Warmup / Drop / Myorep)"
+        title="Tap to cycle set type (Working / Warmup / Drop / Myorep)"
       >
         {isPR && <span className={styles.prBadge}>PR</span>}
         {getSetTypeBadge()}
       </button>
 
-      {/* Previous Performance Ghost Text */}
-      <div className={styles.prevPerf}>
-        {formatPrev()}
+      {/* Previous Performance Ghost Cell with 1-Tap Copy */}
+      <div
+        className={`${styles.prevPerf} ${previousSet && set.weight_value <= 0 ? styles.prevPerfActionable : ''}`}
+        onClick={previousSet ? handleCopyPrevious : undefined}
+        title={previousSet ? 'Tap to copy previous workout performance' : undefined}
+      >
+        <span>{formatPrev()}</span>
+        {previousSet && set.weight_value <= 0 && (
+          <span className={styles.copyBadge}>
+            <Copy size={10} />
+          </span>
+        )}
       </div>
 
-      {/* Weight Pill (Intercepted by Numpad) */}
-      <div
-        className={`${styles.valuePill} ${set.weight_value <= 0 ? styles.valuePillEmpty : ''}`}
-        onClick={() => {
-          onOpenNumpad('weight', set.weight_value, set.weight_unit, (val) => {
-            onUpdate(set.id, { weight_value: val });
-          });
-        }}
-      >
-        <span>{set.weight_value > 0 ? set.weight_value : '—'}</span>
-        <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>{set.weight_unit}</span>
+      {/* Weight Pill (Intercepted by Numpad, with quick-steppers) */}
+      <div className={styles.weightCellGroup}>
+        <div
+          className={`${styles.valuePill} ${set.weight_value <= 0 ? styles.valuePillEmpty : ''}`}
+          onClick={() => {
+            onOpenNumpad(
+              'weight',
+              set.weight_value,
+              set.weight_unit,
+              (val) => {
+                onUpdate(set.id, { weight_value: val });
+              },
+              previousSet?.weight_value
+            );
+          }}
+          title="Tap to edit weight"
+        >
+          <span>{set.weight_value > 0 ? set.weight_value : '—'}</span>
+          <span className={styles.unitText}>{set.weight_unit}</span>
+        </div>
       </div>
 
       {/* Reps Pill (Intercepted by Numpad) */}
       <div
         className={`${styles.valuePill} ${set.reps <= 0 ? styles.valuePillEmpty : ''}`}
         onClick={() => {
-          onOpenNumpad('reps', set.reps, 'reps', (val) => {
-            onUpdate(set.id, { reps: Math.round(val) });
-          });
+          onOpenNumpad(
+            'reps',
+            set.reps,
+            'reps',
+            (val) => {
+              onUpdate(set.id, { reps: Math.round(val) });
+            },
+            previousSet?.reps
+          );
         }}
+        title="Tap to edit reps"
       >
         <span>{set.reps > 0 ? set.reps : '—'}</span>
       </div>
 
-      {/* Large Completion Button */}
+      {/* Completion Button */}
       <button
         type="button"
         className={`${styles.checkBtn} ${set.completed ? styles.checkBtnCompleted : ''}`}

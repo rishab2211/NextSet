@@ -5,7 +5,7 @@ import { EXERCISES } from '../data/exercises';
 import type { ExerciseGuide, MuscleGroup } from '@kinetic/shared';
 import { MuscleMap } from './MuscleMap';
 import { ExerciseModal } from './ExerciseModal';
-import { Search, ChevronRight, Zap } from 'lucide-react';
+import { Search, ChevronRight } from 'lucide-react';
 import styles from './ExerciseExplorer.module.css';
 
 interface ExerciseExplorerProps {
@@ -38,9 +38,9 @@ export const ExerciseExplorer: React.FC<ExerciseExplorerProps> = ({
   return (
     <div className={styles.container}>
       <div className={styles.header}>
-        <h1 className={styles.title}>Anatomy & Form Explorer</h1>
+        <h1 className={styles.title}>Exercise & Form Library</h1>
         <p className={styles.subtitle}>
-          Scientifically vetted execution cues, injury prevention, and muscle activation maps.
+          Form cues, setup instructions, and muscle targeting for all movements.
         </p>
       </div>
 
@@ -59,7 +59,7 @@ export const ExerciseExplorer: React.FC<ExerciseExplorerProps> = ({
         <input
           type="text"
           className={styles.searchInput}
-          placeholder="Search by exercise name, bar, cable..."
+          placeholder="Search exercise, barbell, dumbbell..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
@@ -94,7 +94,7 @@ export const ExerciseExplorer: React.FC<ExerciseExplorerProps> = ({
                 <h3 className={styles.cardTitle}>{exercise.name}</h3>
                 <div className={styles.cardMeta}>{exercise.equipment}</div>
               </div>
-              <span className="badge badge-cyan">SFR {exercise.sfrTier}</span>
+              <span className="badge badge-amber">{exercise.category}</span>
             </div>
 
             <div className={styles.cardFooter}>
@@ -114,7 +114,7 @@ export const ExerciseExplorer: React.FC<ExerciseExplorerProps> = ({
         ))}
       </div>
 
-      {/* Scientific Form Detail Modal */}
+      {/* Form Detail Modal */}
       <ExerciseModal
         exercise={activeModalExercise}
         onClose={() => setActiveModalExercise(null)}

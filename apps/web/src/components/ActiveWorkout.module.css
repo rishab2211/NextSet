@@ -11,12 +11,10 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: var(--space-2) 0;
+  padding: var(--space-3) 0;
   position: sticky;
   top: 0;
-  background: rgba(9, 10, 13, 0.9);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  background: var(--bg-primary);
   z-index: var(--z-sticky-bar);
   border-bottom: 1px solid var(--border-subtle);
 }
@@ -29,7 +27,7 @@
 
 .workoutTitle {
   font-size: var(--font-lg);
-  font-weight: 800;
+  font-weight: 700;
   color: var(--text-primary);
   display: flex;
   align-items: center;
@@ -39,10 +37,11 @@
 .durationBadge {
   font-family: var(--font-mono);
   font-size: var(--font-xs);
-  color: var(--accent-cyan);
+  color: var(--accent-primary);
   display: flex;
   align-items: center;
   gap: 4px;
+  font-weight: 600;
 }
 
 .topActions {
@@ -52,40 +51,44 @@
 }
 
 .finishBtn {
-  background: linear-gradient(135deg, var(--accent-volt), var(--accent-volt-dark));
-  color: var(--text-inverse);
-  font-weight: 800;
-  font-size: var(--font-xs);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  padding: 8px 16px;
-  border-radius: var(--radius-full);
-  box-shadow: var(--shadow-glow-volt);
+  background: var(--success);
+  color: #ffffff;
+  font-weight: 700;
+  font-size: var(--font-sm);
+  padding: 8px 18px;
+  border-radius: var(--radius-sm);
   display: flex;
   align-items: center;
   gap: 6px;
-  transition: transform var(--transition-fast);
+  transition: transform var(--transition-fast), background-color var(--transition-fast);
 }
 
 .finishBtn:active {
-  transform: scale(0.95);
+  transform: scale(0.96);
+  background: #059669;
 }
 
 .cancelBtn {
   color: var(--text-muted);
   font-size: var(--font-xs);
-  padding: 6px;
+  padding: 8px;
   border-radius: var(--radius-sm);
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: all var(--transition-fast);
+}
+
+.cancelBtn:active {
+  background: var(--bg-elevated);
+  color: var(--danger);
 }
 
 /* Exercise Cards List */
 .exerciseCard {
   background: var(--bg-secondary);
   border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-md);
   padding: var(--space-4);
   display: flex;
   flex-direction: column;
@@ -95,14 +98,16 @@
 
 .exerciseHeader {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
+  gap: var(--space-2);
 }
 
 .exerciseInfo {
   display: flex;
   flex-direction: column;
   gap: 2px;
+  flex: 1;
 }
 
 .exerciseName {
@@ -114,6 +119,14 @@
 .exerciseSub {
   font-size: var(--font-xs);
   color: var(--text-secondary);
+  text-transform: capitalize;
+}
+
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  position: relative;
 }
 
 .guideBtn {
@@ -122,84 +135,91 @@
   gap: 4px;
   font-size: var(--font-xs);
   font-weight: 600;
-  color: var(--accent-cyan);
-  background: rgba(0, 240, 255, 0.08);
-  border: 1px solid rgba(0, 240, 255, 0.2);
-  padding: 4px 10px;
-  border-radius: var(--radius-full);
+  color: var(--text-primary);
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-subtle);
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
   transition: all var(--transition-fast);
 }
 
 .guideBtn:active {
-  background: rgba(0, 240, 255, 0.2);
+  background: var(--bg-elevated);
+  border-color: var(--border-medium);
 }
 
-.plateBtn {
+.menuBtn {
   display: flex;
   align-items: center;
-  gap: 4px;
-  font-size: var(--font-xs);
-  font-weight: 600;
-  color: var(--accent-volt);
-  background: rgba(204, 255, 0, 0.08);
-  border: 1px solid rgba(204, 255, 0, 0.25);
-  padding: 4px 10px;
-  border-radius: var(--radius-full);
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
   transition: all var(--transition-fast);
 }
 
-.plateBtn:active {
-  background: rgba(204, 255, 0, 0.2);
+.menuBtn:active {
+  background: var(--bg-elevated);
+  color: var(--text-primary);
 }
 
-.strengthBtn {
+/* Exercise Overflow Menu Dropdown */
+.exerciseMenuDropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 4px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  min-width: 200px;
+  z-index: 60;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.menuItem {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: var(--space-2);
+  padding: 10px 14px;
   font-size: var(--font-xs);
   font-weight: 600;
-  color: var(--accent-amber);
-  background: rgba(245, 158, 11, 0.08);
-  border: 1px solid rgba(245, 158, 11, 0.25);
-  padding: 4px 10px;
-  border-radius: var(--radius-full);
-  transition: all var(--transition-fast);
+  color: var(--text-primary);
+  text-align: left;
+  border-bottom: 1px solid var(--border-subtle);
+  transition: background var(--transition-fast);
 }
 
-.strengthBtn:active {
-  background: rgba(245, 158, 11, 0.2);
+.menuItem:last-child {
+  border-bottom: none;
 }
 
-.headerSwapBtn {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  font-size: var(--font-xs);
-  font-weight: 600;
-  color: #a78bfa;
-  background: rgba(167, 139, 250, 0.08);
-  border: 1px solid rgba(167, 139, 250, 0.25);
-  padding: 4px 10px;
-  border-radius: var(--radius-full);
-  transition: all var(--transition-fast);
+.menuItem:hover,
+.menuItem:active {
+  background: var(--bg-tertiary);
 }
 
-.headerSwapBtn:active {
-  background: rgba(167, 139, 250, 0.2);
+.menuItemDanger {
+  color: var(--danger);
 }
 
-/* Set Table Headers */
+/* Table Column Headers */
 .setTableHeader {
   display: grid;
   grid-template-columns: 36px 1fr 76px 64px 44px;
   gap: var(--space-2);
   padding: 0 var(--space-3);
-  font-size: 10px;
+  font-size: var(--font-xs);
   font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
   color: var(--text-muted);
-  text-align: center;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
 .setTableList {
@@ -212,21 +232,21 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  height: 40px;
+  gap: var(--space-2);
+  padding: 10px;
+  border-radius: var(--radius-sm);
   background: var(--bg-tertiary);
   border: 1px dashed var(--border-medium);
-  border-radius: var(--radius-md);
   color: var(--text-secondary);
-  font-weight: 600;
   font-size: var(--font-sm);
+  font-weight: 600;
   transition: all var(--transition-fast);
 }
 
 .addSetBtn:active {
   background: var(--bg-elevated);
   color: var(--text-primary);
-  border-color: var(--accent-cyan);
+  border-style: solid;
 }
 
 .addExerciseBtn {
@@ -234,56 +254,54 @@
   align-items: center;
   justify-content: center;
   gap: var(--space-2);
-  height: var(--touch-target-comfortable);
+  height: 48px;
   background: var(--bg-secondary);
-  border: 1px dashed var(--accent-cyan);
-  border-radius: var(--radius-lg);
-  color: var(--accent-cyan);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
   font-size: var(--font-base);
   font-weight: 700;
-  box-shadow: var(--shadow-glow-cyan);
-  transition: transform var(--transition-fast);
+  transition: all var(--transition-fast);
 }
 
 .addExerciseBtn:active {
-  transform: scale(0.98);
+  background: var(--bg-tertiary);
+  border-color: var(--border-medium);
 }
 
-/* Add Exercise Drawer / Sheet */
+/* Exercise Picker Modal */
 .pickerOverlay {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.75);
-  backdrop-filter: blur(8px);
+  background: rgba(0, 0, 0, 0.7);
   z-index: var(--z-modal);
   display: flex;
-  align-items: flex-end;
-  justify-content: center;
+  flex-direction: column;
+  justify-content: flex-end;
 }
 
 .pickerDrawer {
-  width: 100%;
   max-width: 480px;
-  height: 82vh;
-  background: var(--bg-secondary);
-  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+  width: 100%;
+  margin: 0 auto;
+  max-height: 85vh;
+  background: var(--bg-primary);
   border-top: 1px solid var(--border-medium);
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
-  animation: slideUp 200ms ease-out;
+  animation: slideUpDrawer 200ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .pickerHeader {
   padding: var(--space-4);
-  border-bottom: 1px solid var(--border-subtle);
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
-  background: var(--bg-tertiary);
+  border-bottom: 1px solid var(--border-subtle);
 }
 
 .pickerTop {
@@ -292,52 +310,57 @@
   justify-content: space-between;
 }
 
+.pickerTop h3 {
+  font-size: var(--font-lg);
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
 .searchInput {
   width: 100%;
   height: 44px;
   background: var(--bg-secondary);
   border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-md);
-  padding: 0 var(--space-4);
+  border-radius: var(--radius-sm);
+  padding: 0 var(--space-3);
   color: var(--text-primary);
   font-size: var(--font-sm);
+  font-family: inherit;
   outline: none;
 }
 
 .searchInput:focus {
-  border-color: var(--accent-cyan);
+  border-color: var(--accent-primary);
 }
 
 .filterChips {
   display: flex;
   gap: var(--space-2);
   overflow-x: auto;
-  padding-bottom: 4px;
+  padding-bottom: 2px;
 }
 
 .chip {
-  padding: 6px 14px;
+  padding: 4px 12px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
   border-radius: var(--radius-full);
   font-size: var(--font-xs);
-  font-weight: 600;
-  text-transform: capitalize;
-  background: var(--bg-secondary);
   color: var(--text-secondary);
-  border: 1px solid var(--border-subtle);
+  font-weight: 600;
   white-space: nowrap;
+  text-transform: capitalize;
 }
 
 .chipActive {
-  background: var(--accent-cyan);
-  color: var(--text-inverse);
-  font-weight: 700;
-  border-color: var(--accent-cyan);
+  background: var(--accent-primary);
+  color: #ffffff;
+  border-color: var(--accent-primary);
 }
 
 .pickerList {
-  flex: 1;
   overflow-y: auto;
-  padding: var(--space-4);
+  padding: var(--space-2) var(--space-4) 40px;
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
@@ -347,14 +370,82 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: var(--space-3) var(--space-4);
-  background: var(--bg-tertiary);
+  padding: var(--space-3);
+  background: var(--bg-secondary);
   border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
   transition: all var(--transition-fast);
 }
 
 .pickerItem:active {
-  background: var(--bg-elevated);
+  background: var(--bg-tertiary);
   border-color: var(--border-medium);
+}
+
+/* Safe Discard Confirmation Dialog */
+.confirmOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.75);
+  z-index: var(--z-modal);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-4);
+}
+
+.confirmCard {
+  width: 100%;
+  max-width: 380px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-md);
+  padding: var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  box-shadow: var(--shadow-lg);
+}
+
+.confirmTitle {
+  font-size: var(--font-lg);
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.confirmDesc {
+  font-size: var(--font-sm);
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+.confirmActions {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.confirmKeepBtn {
+  flex: 1;
+  height: 44px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-weight: 700;
+  font-size: var(--font-sm);
+}
+
+.confirmDiscardBtn {
+  flex: 1;
+  height: 44px;
+  background: var(--danger);
+  border: none;
+  border-radius: var(--radius-sm);
+  color: #ffffff;
+  font-weight: 700;
+  font-size: var(--font-sm);
 }

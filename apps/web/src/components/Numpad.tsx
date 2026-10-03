@@ -10,6 +10,7 @@ interface NumpadProps {
   isOpen: boolean;
   mode: NumpadMode;
   initialValue: number;
+  prevValue?: number;
   unit?: string;
   title?: string;
   onConfirm: (value: number) => void;
@@ -21,6 +22,7 @@ export const Numpad: React.FC<NumpadProps> = ({
   isOpen,
   mode,
   initialValue,
+  prevValue,
   unit,
   title,
   onConfirm,
@@ -39,7 +41,7 @@ export const Numpad: React.FC<NumpadProps> = ({
 
   const handleDigit = (digit: string) => {
     if (digit === '.' && currentStr.includes('.')) return;
-    if (currentStr.length >= 6) return; // Prevent unreasonable numbers
+    if (currentStr.length >= 6) return;
     setCurrentStr((prev) => (prev === '0' && digit !== '.' ? digit : prev + digit));
   };
 
@@ -57,6 +59,12 @@ export const Numpad: React.FC<NumpadProps> = ({
     setCurrentStr(next.toString());
   };
 
+  const handleMatchPrev = () => {
+    if (prevValue && prevValue > 0) {
+      setCurrentStr(prevValue.toString());
+    }
+  };
+
   const handleConfirm = () => {
     const val = parseFloat(currentStr) || 0;
     onConfirm(val);
@@ -67,7 +75,7 @@ export const Numpad: React.FC<NumpadProps> = ({
     mode === 'weight'
       ? [1.25, 2.5, 5, 10]
       : mode === 'reps'
-      ? [1, 2, 5, 10]
+      ? [1, 2, 5]
       : [0.5, 1.0];
 
   return (
@@ -84,11 +92,23 @@ export const Numpad: React.FC<NumpadProps> = ({
 
         {/* Quick Increment Buttons */}
         <div className={styles.quickBar}>
+          {prevValue !== undefined && prevValue > 0 && (
+            <button
+              type="button"
+              className={styles.quickBtn}
+              style={{ color: 'var(--accent-primary)', borderColor: 'rgba(249, 115, 22, 0.35)', flex: '1.2' }}
+              onClick={handleMatchPrev}
+              title={`Match previous: ${prevValue}`}
+            >
+              Prev ({prevValue})
+            </button>
+          )}
+
           {mode === 'weight' && onOpenPlateCalculator && (
             <button
               type="button"
               className={styles.quickBtn}
-              style={{ color: 'var(--accent-volt)', borderColor: 'rgba(204, 255, 0, 0.3)', flex: '1.3' }}
+              style={{ flex: '1.1' }}
               onClick={() => {
                 const val = parseFloat(currentStr) || initialValue || 20;
                 onClose();
@@ -98,6 +118,7 @@ export const Numpad: React.FC<NumpadProps> = ({
               Plates 🏋️
             </button>
           )}
+
           {quickIncrements.map((inc) => (
             <button
               key={inc}
@@ -108,6 +129,7 @@ export const Numpad: React.FC<NumpadProps> = ({
               +{inc}
             </button>
           ))}
+
           <button type="button" className={styles.quickBtn} onClick={handleClear}>
             C
           </button>
@@ -149,7 +171,7 @@ export const Numpad: React.FC<NumpadProps> = ({
             onClick={handleBackspace}
             aria-label="Backspace"
           >
-            <Delete size={24} />
+            <Delete size={22} />
           </button>
         </div>
 
@@ -158,8 +180,8 @@ export const Numpad: React.FC<NumpadProps> = ({
           className={`${styles.keyBtn} ${styles.confirmBtn}`}
           onClick={handleConfirm}
         >
-          <Check size={22} style={{ marginRight: 6 }} />
-          Confirm {mode.toUpperCase()}
+          <Check size={20} style={{ marginRight: 6 }} />
+          <span>Done</span>
         </button>
       </div>
     </div>

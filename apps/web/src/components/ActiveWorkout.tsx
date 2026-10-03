@@ -1,8 +1,7 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
-import confetti from 'canvas-confetti';
 import { db } from '../lib/db';
 import {
   finishWorkoutSession,
@@ -10,10 +9,10 @@ import {
   addWorkoutSet,
   updateWorkoutSet,
   deleteWorkoutSet,
-  getPreviousExerciseSets,
+  swapExerciseInSession,
 } from '../lib/db/workoutStore';
 import { EXERCISES, getExerciseById } from '../data/exercises';
-import type { WorkoutSession, WorkoutSet, ExerciseGuide, MuscleGroup } from '@kinetic/shared';
+import type { WorkoutSession, WorkoutSet, ExerciseGuide } from '@kinetic/shared';
 import { SetRow } from './SetRow';
 import { Numpad, type NumpadMode } from './Numpad';
 import { RestTimer } from './RestTimer';
@@ -22,9 +21,8 @@ import { PlateCalculatorModal } from './PlateCalculatorModal';
 import { StrengthCurveModal } from './StrengthCurveModal';
 import { ExerciseSwapModal } from './ExerciseSwapModal';
 import { checkPersonalRecord } from '../lib/strengthMath';
-import { swapExerciseInSession } from '../lib/db/workoutStore';
 import {
-  CheckCircle,
+  Check,
   Plus,
   BookOpen,
   Clock,
@@ -35,6 +33,7 @@ import {
   Disc,
   Trophy,
   ArrowLeftRight,
+  MoreVertical,
 } from 'lucide-react';
 import styles from './ActiveWorkout.module.css';
 
@@ -58,7 +57,7 @@ export const ActiveWorkout: React.FC<ActiveWorkoutProps> = ({
     [session.id]
   ) || [];
 
-  // Historical completed sets for real-time PR detection
+  // Historical completed sets for real-time PR detection and Ghost Logging
   const allHistoricalSets = useLiveQuery(
     () =>
       db.workoutSets
@@ -66,6 +65,35 @@ export const ActiveWorkout: React.FC<ActiveWorkoutProps> = ({
         .toArray(),
     [session.id]
   ) || [];
+
+  // Map of exercise ID to previous completed session's sets
+  const previousSessionSetsByExercise = useMemo(() => {
+    const result: Record<string, WorkoutSet[]> = {};
+
+    // Group by exercise
+    const byExercise: Record<string, WorkoutSet[]> = {};
+    for (const s of allHistoricalSets) {
+      if (!byExercise[s.exercise_id]) byExercise[s.exercise_id] = [];
+      byExercise[s.exercise_id].push(s);
+    }
+
+    for (const [exId, exSets] of Object.entries(byExercise)) {
+      // Sort sets descending by completed/created time to find latest prior session
+      const sorted = [...exSets].sort(
+        (a, b) =>
+          new Date(b.completed_at || b.created_at).getTime() -
+          new Date(a.completed_at || a.created_at).getTime()
+      );
+      if (sorted.length > 0) {
+        const latestSessionId = sorted[0].session_id;
+        result[exId] = sorted
+          .filter((s) => s.session_id === latestSessionId)
+          .sort((a, b) => a.set_number - b.set_number);
+      }
+    }
+
+    return result;
+  }, [allHistoricalSets]);
 
   // 2. Elapsed workout duration timer
   const [elapsedSec, setElapsedSec] = useState<number>(0);
@@ -105,6 +133,7 @@ export const ActiveWorkout: React.FC<ActiveWorkoutProps> = ({
     isOpen: boolean;
     mode: NumpadMode;
     initialValue: number;
+    prevValue?: number;
     unit?: string;
     callback: (val: number) => void;
   }>({
@@ -118,12 +147,14 @@ export const ActiveWorkout: React.FC<ActiveWorkoutProps> = ({
     mode: NumpadMode,
     initialValue: number,
     unit: string,
-    callback: (val: number) => void
+    callback: (val: number) => void,
+    prevValue?: number
   ) => {
     setNumpadConfig({
       isOpen: true,
       mode,
       initialValue,
+      prevValue,
       unit,
       callback,
     });
@@ -182,6 +213,12 @@ export const ActiveWorkout: React.FC<ActiveWorkoutProps> = ({
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedMuscleFilter, setSelectedMuscleFilter] = useState<string>('all');
 
+  // 10. Safe Discard Confirmation Dialog State
+  const [isDiscardConfirmOpen, setIsDiscardConfirmOpen] = useState<boolean>(false);
+
+  // 11. Active Exercise Overflow Dropdown Menu State
+  const [activeMenuExerciseId, setActiveMenuExerciseId] = useState<string | null>(null);
+
   // Unique exercise IDs present in this workout
   const exerciseIdsInWorkout = Array.from(new Set(sets.map((s) => s.exercise_id)));
 
@@ -200,7 +237,6 @@ export const ActiveWorkout: React.FC<ActiveWorkoutProps> = ({
     await updateWorkoutSet(set.id, { completed: nextCompleted });
 
     if (nextCompleted) {
-      // Trigger rest timer
       startRestTimer(90);
     }
   };
@@ -210,52 +246,71 @@ export const ActiveWorkout: React.FC<ActiveWorkoutProps> = ({
     const nextSetNumber = exerciseSets.length + 1;
     const lastSet = exerciseSets[exerciseSets.length - 1];
 
+    const prevSets = previousSessionSetsByExercise[exerciseId] || [];
+    const targetPrev = prevSets.find((p) => p.set_number === nextSetNumber) || prevSets[prevSets.length - 1];
+
+    const initialWeight =
+      lastSet && lastSet.weight_value > 0
+        ? lastSet.weight_value
+        : targetPrev && targetPrev.weight_value > 0
+        ? targetPrev.weight_value
+        : 0;
+
+    const initialReps =
+      lastSet && lastSet.reps > 0
+        ? lastSet.reps
+        : targetPrev && targetPrev.reps > 0
+        ? targetPrev.reps
+        : 10;
+
+    const initialUnit = lastSet ? lastSet.weight_unit : targetPrev ? targetPrev.weight_unit : 'kg';
+
     await addWorkoutSet({
       sessionId: session.id,
       exerciseId,
       setNumber: nextSetNumber,
-      weightValue: lastSet ? lastSet.weight_value : 0,
-      weightUnit: lastSet ? lastSet.weight_unit : 'kg',
-      reps: lastSet ? lastSet.reps : 10,
+      weightValue: initialWeight,
+      weightUnit: initialUnit,
+      reps: initialReps,
       setType: 'working',
     });
   };
 
   const handleSelectExerciseFromPicker = async (exercise: ExerciseGuide) => {
     setIsPickerOpen(false);
-    // Add first set for this exercise
+
+    // Prepopulate with previous performance if available
+    const prevSets = previousSessionSetsByExercise[exercise.id] || [];
+    const firstPrev = prevSets[0];
+
     await addWorkoutSet({
       sessionId: session.id,
       exerciseId: exercise.id,
       setNumber: 1,
-      weightValue: 0,
-      weightUnit: 'kg',
-      reps: exercise.recommendedRepRange.min || 8,
+      weightValue: firstPrev ? firstPrev.weight_value : 0,
+      weightUnit: firstPrev ? firstPrev.weight_unit : 'kg',
+      reps: firstPrev ? firstPrev.reps : exercise.recommendedRepRange.min || 8,
       setType: 'working',
     });
   };
 
-  const handleFinish = async () => {
-    try {
-      confetti({
-        particleCount: 80,
-        spread: 70,
-        origin: { y: 0.6 },
-        colors: ['#00f0ff', '#ccff00', '#10b981', '#f59e0b'],
-      });
-    } catch (e) {
-      // Confetti fallback
+  const handleRemoveExerciseFromWorkout = async (exerciseId: string) => {
+    const exerciseSets = setsByExercise[exerciseId] || [];
+    for (const s of exerciseSets) {
+      await deleteWorkoutSet(s.id);
     }
+    setActiveMenuExerciseId(null);
+  };
 
+  const handleFinish = async () => {
     await finishWorkoutSession(session.id);
     onFinishWorkout();
   };
 
-  const handleCancel = async () => {
-    if (window.confirm('Are you sure you want to discard this workout?')) {
-      await abandonWorkoutSession(session.id);
-      onFinishWorkout();
-    }
+  const handleConfirmDiscard = async () => {
+    await abandonWorkoutSession(session.id);
+    setIsDiscardConfirmOpen(false);
+    onFinishWorkout();
   };
 
   // Filtered exercises for picker
@@ -276,7 +331,7 @@ export const ActiveWorkout: React.FC<ActiveWorkoutProps> = ({
       <div className={styles.topBar}>
         <div className={styles.workoutMeta}>
           <div className={styles.workoutTitle}>
-            <Dumbbell size={20} color="var(--accent-cyan)" />
+            <Dumbbell size={20} color="var(--accent-primary)" />
             <span>{session.title}</span>
           </div>
           <div className={styles.durationBadge}>
@@ -289,8 +344,8 @@ export const ActiveWorkout: React.FC<ActiveWorkoutProps> = ({
           <button
             type="button"
             className={styles.cancelBtn}
-            onClick={handleCancel}
-            title="Discard Workout"
+            onClick={() => setIsDiscardConfirmOpen(true)}
+            title="Discard Workout Session"
           >
             <Trash2 size={18} />
           </button>
@@ -299,7 +354,7 @@ export const ActiveWorkout: React.FC<ActiveWorkoutProps> = ({
             className={styles.finishBtn}
             onClick={handleFinish}
           >
-            <CheckCircle size={16} />
+            <Check size={16} strokeWidth={2.5} />
             <span>Finish</span>
           </button>
         </div>
@@ -310,7 +365,7 @@ export const ActiveWorkout: React.FC<ActiveWorkoutProps> = ({
         <div
           style={{
             textAlign: 'center',
-            padding: '40px 20px',
+            padding: '50px 20px',
             color: 'var(--text-secondary)',
             display: 'flex',
             flexDirection: 'column',
@@ -319,15 +374,16 @@ export const ActiveWorkout: React.FC<ActiveWorkoutProps> = ({
           }}
         >
           <Dumbbell size={48} color="var(--border-strong)" />
-          <h3>Workout is Empty</h3>
+          <h3 style={{ color: 'var(--text-primary)', fontSize: 'var(--font-lg)' }}>Workout is Empty</h3>
           <p style={{ fontSize: 'var(--font-sm)', color: 'var(--text-muted)' }}>
-            Add your first exercise below to begin logging sets with instant numeric inputs.
+            Add your first exercise below to begin logging sets with instant numerical entries.
           </p>
         </div>
       ) : (
         exerciseIdsInWorkout.map((exId) => {
           const exercise = getExerciseById(exId);
           const exerciseSets = setsByExercise[exId] || [];
+          const prevSets = previousSessionSetsByExercise[exId] || [];
 
           return (
             <div key={exId} className={styles.exerciseCard}>
@@ -341,76 +397,102 @@ export const ActiveWorkout: React.FC<ActiveWorkoutProps> = ({
                   </div>
                 </div>
 
-                <div style={{ display: 'flex', gap: '6px' }}>
-                  {/* Equipment Busy Exercise Swapper */}
-                  <button
-                    type="button"
-                    className={styles.headerSwapBtn}
-                    onClick={() => setSwapModalExerciseId(exId)}
-                    title="Swap exercise if equipment is occupied"
-                  >
-                    <ArrowLeftRight size={13} />
-                    <span>Swap</span>
-                  </button>
-
-                  {/* 1RM Strength Curve Button */}
-                  <button
-                    type="button"
-                    className={styles.strengthBtn}
-                    onClick={() => {
-                      const topSet = [...exerciseSets].sort((a, b) => b.weight_value - a.weight_value)[0];
-                      const firstSet = exerciseSets[0];
-                      setStrengthModalConfig({
-                        isOpen: true,
-                        exerciseName: exercise ? exercise.name : exId,
-                        topWeight: topSet ? topSet.weight_value : 60,
-                        topReps: topSet ? topSet.reps : 8,
-                        unit: topSet ? topSet.weight_unit : 'kg',
-                        callback: (appliedWeight) => {
-                          if (firstSet) {
-                            updateWorkoutSet(firstSet.id, { weight_value: appliedWeight });
-                          }
-                        },
-                      });
-                    }}
-                    title="View estimated 1RM and percentage strength curves"
-                  >
-                    <Trophy size={13} />
-                    <span>1RM</span>
-                  </button>
-
-                  {exercise?.category === 'barbell' && (
-                    <button
-                      type="button"
-                      className={styles.plateBtn}
-                      onClick={() => {
-                        const firstSet = exerciseSets[0];
-                        openPlateCalculator(
-                          firstSet ? firstSet.weight_value : 20,
-                          firstSet ? firstSet.weight_unit : 'kg',
-                          (val) => {
-                            if (firstSet) {
-                              updateWorkoutSet(firstSet.id, { weight_value: val });
-                            }
-                          }
-                        );
-                      }}
-                      title="Calculate barbell plates per side"
-                    >
-                      <Disc size={13} />
-                      <span>Plates</span>
-                    </button>
-                  )}
-
+                <div className={styles.headerActions}>
                   {exercise && (
                     <button
                       type="button"
                       className={styles.guideBtn}
                       onClick={() => setModalExercise(exercise)}
+                      title="View setup cues and common mistakes"
                     >
                       <BookOpen size={13} />
-                      <span>Form Guide</span>
+                      <span>Cues</span>
                     </button>
+                  )}
+
+                  <button
+                    type="button"
+                    className={styles.menuBtn}
+                    onClick={() =>
+                      setActiveMenuExerciseId(activeMenuExerciseId === exId ? null : exId)
+                    }
+                    title="Exercise options"
+                  >
+                    <MoreVertical size={16} />
+                  </button>
+
+                  {/* Contextual Options Dropdown */}
+                  {activeMenuExerciseId === exId && (
+                    <div className={styles.exerciseMenuDropdown}>
+                      <button
+                        type="button"
+                        className={styles.menuItem}
+                        onClick={() => {
+                          setSwapModalExerciseId(exId);
+                          setActiveMenuExerciseId(null);
+                        }}
+                      >
+                        <ArrowLeftRight size={14} color="var(--accent-primary)" />
+                        <span>Swap (Equipment Busy)</span>
+                      </button>
+
+                      {exercise?.category === 'barbell' && (
+                        <button
+                          type="button"
+                          className={styles.menuItem}
+                          onClick={() => {
+                            const firstSet = exerciseSets[0];
+                            setActiveMenuExerciseId(null);
+                            openPlateCalculator(
+                              firstSet ? firstSet.weight_value : 20,
+                              firstSet ? firstSet.weight_unit : 'kg',
+                              (val) => {
+                                if (firstSet) {
+                                  updateWorkoutSet(firstSet.id, { weight_value: val });
+                                }
+                              }
+                            );
+                          }}
+                        >
+                          <Disc size={14} color="var(--accent-volt)" />
+                          <span>Plate Calculator</span>
+                        </button>
+                      )}
+
+                      <button
+                        type="button"
+                        className={styles.menuItem}
+                        onClick={() => {
+                          const topSet = [...exerciseSets].sort((a, b) => b.weight_value - a.weight_value)[0];
+                          const firstSet = exerciseSets[0];
+                          setActiveMenuExerciseId(null);
+                          setStrengthModalConfig({
+                            isOpen: true,
+                            exerciseName: exercise ? exercise.name : exId,
+                            topWeight: topSet ? topSet.weight_value : 60,
+                            topReps: topSet ? topSet.reps : 8,
+                            unit: topSet ? topSet.weight_unit : 'kg',
+                            callback: (appliedWeight) => {
+                              if (firstSet) {
+                                updateWorkoutSet(firstSet.id, { weight_value: appliedWeight });
+                              }
+                            },
+                          });
+                        }}
+                      >
+                        <Trophy size={14} color="var(--accent-amber)" />
+                        <span>1RM & Strength Zones</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        className={`${styles.menuItem} ${styles.menuItemDanger}`}
+                        onClick={() => handleRemoveExerciseFromWorkout(exId)}
+                      >
+                        <Trash2 size={14} />
+                        <span>Remove Exercise</span>
+                      </button>
+                    </div>
                   )}
                 </div>
               </div>
@@ -424,18 +506,23 @@ export const ActiveWorkout: React.FC<ActiveWorkoutProps> = ({
                 <span>DONE</span>
               </div>
 
-              {/* Set Rows */}
+              {/* Set Rows with Ghost of Past Self passed explicitly */}
               <div className={styles.setTableList}>
-                {exerciseSets.map((st) => {
+                {exerciseSets.map((st, idx) => {
                   const exHistoricalSets = allHistoricalSets.filter(
                     (h) => h.exercise_id === st.exercise_id
                   );
                   const prResult = checkPersonalRecord(st, exHistoricalSets);
 
+                  // Match previous set by set number or sequential index
+                  const matchingPrev =
+                    prevSets.find((p) => p.set_number === st.set_number) || prevSets[idx];
+
                   return (
                     <SetRow
                       key={st.id}
                       set={st}
+                      previousSet={matchingPrev}
                       onUpdate={(id, updates) => updateWorkoutSet(id, updates)}
                       onCompleteToggle={handleToggleComplete}
                       onOpenNumpad={openNumpad}
@@ -537,9 +624,36 @@ export const ActiveWorkout: React.FC<ActiveWorkoutProps> = ({
                       {ex.category} · {ex.primaryMuscles.join(', ')}
                     </div>
                   </div>
-                  <span className="badge badge-cyan">SFR {ex.sfrTier}</span>
                 </div>
               ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Safe Discard Confirmation Dialog */}
+      {isDiscardConfirmOpen && (
+        <div className={styles.confirmOverlay} onClick={() => setIsDiscardConfirmOpen(false)}>
+          <div className={styles.confirmCard} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.confirmTitle}>Discard Workout?</div>
+            <div className={styles.confirmDesc}>
+              Are you sure you want to discard this workout? All sets and progress logged during this session will be discarded.
+            </div>
+            <div className={styles.confirmActions}>
+              <button
+                type="button"
+                className={styles.confirmKeepBtn}
+                onClick={() => setIsDiscardConfirmOpen(false)}
+              >
+                Keep Workout
+              </button>
+              <button
+                type="button"
+                className={styles.confirmDiscardBtn}
+                onClick={handleConfirmDiscard}
+              >
+                Discard
+              </button>
             </div>
           </div>
         </div>
@@ -558,6 +672,7 @@ export const ActiveWorkout: React.FC<ActiveWorkoutProps> = ({
         isOpen={numpadConfig.isOpen}
         mode={numpadConfig.mode}
         initialValue={numpadConfig.initialValue}
+        prevValue={numpadConfig.prevValue}
         unit={numpadConfig.unit}
         onConfirm={numpadConfig.callback}
         onClose={() => setNumpadConfig((prev) => ({ ...prev, isOpen: false }))}
@@ -566,7 +681,7 @@ export const ActiveWorkout: React.FC<ActiveWorkoutProps> = ({
         }}
       />
 
-      {/* Visual Barbell Plate Calculator Modal */}
+      {/* Barbell Plate Calculator Modal */}
       <PlateCalculatorModal
         isOpen={plateCalcConfig.isOpen}
         initialWeight={plateCalcConfig.initialWeight}
@@ -575,7 +690,7 @@ export const ActiveWorkout: React.FC<ActiveWorkoutProps> = ({
         onApplyWeight={plateCalcConfig.callback}
       />
 
-      {/* Scientific Form Guide Modal */}
+      {/* Form Guide Modal */}
       <ExerciseModal
         exercise={modalExercise}
         onClose={() => setModalExercise(null)}
