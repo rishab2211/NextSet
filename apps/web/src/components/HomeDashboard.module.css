@@ -1,0 +1,146 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-4) var(--space-4) 90px;
+  gap: var(--space-5);
+}
+
+.topBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.logoArea {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.logoIcon {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  background: linear-gradient(135deg, var(--accent-cyan), var(--accent-volt));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-inverse);
+  box-shadow: var(--shadow-glow-cyan);
+}
+
+.logoText {
+  font-size: var(--font-xl);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: var(--text-primary);
+}
+
+.statusArea {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+/* Active Workout Resume Banner */
+.activeBanner {
+  background: linear-gradient(135deg, rgba(0, 240, 255, 0.15), rgba(204, 255, 0, 0.08));
+  border: 1px solid var(--accent-cyan);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  box-shadow: var(--shadow-glow-cyan);
+  animation: pulseSubtle 3s infinite ease-in-out;
+}
+
+.bannerTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.bannerTitle {
+  font-size: var(--font-base);
+  font-weight: 800;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+/* Routine Presets Grid */
+.sectionTitle {
+  font-size: var(--font-base);
+  font-weight: 800;
+  color: var(--text-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: var(--space-2);
+}
+
+.routinesGrid {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.routineCard {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.routineCard:active {
+  background: var(--bg-tertiary);
+  transform: scale(0.98);
+  border-color: var(--accent-cyan);
+}
+
+.routineInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.routineName {
+  font-size: var(--font-base);
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.routineDesc {
+  font-size: var(--font-xs);
+  color: var(--text-secondary);
+}
+
+/* Featured Exercises Section */
+.featuredList {
+  display: flex;
+  gap: var(--space-3);
+  overflow-x: auto;
+  padding-bottom: var(--space-2);
+}
+
+.featuredCard {
+  min-width: 220px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  cursor: pointer;
+}
+
+.featuredCard:active {
+  border-color: var(--accent-cyan);
+}
