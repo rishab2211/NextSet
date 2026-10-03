@@ -64,7 +64,8 @@ button {
   touch-action: manipulation;
 }
 
-.btn-primary {
+.btn-primary,
+.btn-cyan {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -80,7 +81,8 @@ button {
   transition: transform var(--transition-fast), opacity var(--transition-fast);
 }
 
-.btn-primary:active {
+.btn-primary:active,
+.btn-cyan:active {
   transform: scale(0.97);
   opacity: 0.9;
 }

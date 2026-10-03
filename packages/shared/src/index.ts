@@ -127,3 +127,26 @@ export interface RestTimerState {
   durationSeconds: number;
   exerciseName?: string;
 }
+
+export interface AuthUser {
+  id: string;
+  email: string;
+  is_anonymous: boolean;
+  created_at: string;
+}
+
+export interface AuthTokenResponse {
+  token: string;
+  user: AuthUser;
+}
+
+export interface MagicLinkRequest {
+  email: string;
+  anonymous_user_id?: string;
+}
+
+export interface VerifyOtpRequest {
+  email: string;
+  code: string;
+  anonymous_user_id?: string;
+}

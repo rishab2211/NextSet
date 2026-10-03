@@ -1,4 +1,5 @@
 import { db } from './index';
+import { getEffectiveUserId } from '../auth/authStore';
 import type { WorkoutSession, WorkoutSet, SetType, WeightUnit } from '@kinetic/shared';
 
 // Safe UUID generation fallback for environments without crypto.randomUUID
@@ -8,8 +9,6 @@ function generateId(): string {
   }
   return 'id-' + Math.random().toString(36).substring(2, 9) + '-' + Date.now();
 }
-
-const DEFAULT_USER_ID = 'user_kinetic_local';
 
 /**
  * Starts a new active workout session in Dexie.
@@ -41,10 +40,10 @@ export async function startWorkoutSession(title: string = 'Gym Workout'): Promis
       });
     }
 
-    // 2. Create new session
+    // 2. Create new session with user partition
     const newSession: WorkoutSession = {
       id: generateId(),
-      user_id: DEFAULT_USER_ID,
+      user_id: getEffectiveUserId(),
       title,
       started_at: now,
       status: 'active',

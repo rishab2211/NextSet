@@ -42,6 +42,26 @@
   gap: var(--space-2);
 }
 
+.authBadgeBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-primary);
+  font-size: var(--font-xs);
+  font-weight: 700;
+  padding: 5px 10px;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.authBadgeBtn:hover, .authBadgeBtn:active {
+  border-color: var(--accent-cyan);
+  background: rgba(0, 240, 255, 0.08);
+}
+
 /* Active Workout Resume Banner */
 .activeBanner {
   background: linear-gradient(135deg, rgba(0, 240, 255, 0.15), rgba(204, 255, 0, 0.08));

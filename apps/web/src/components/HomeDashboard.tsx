@@ -1,9 +1,11 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import type { WorkoutSession, ExerciseGuide } from '@kinetic/shared';
+import type { WorkoutSession, ExerciseGuide, AuthUser } from '@kinetic/shared';
 import { EXERCISES } from '../data/exercises';
 import { ExerciseModal } from './ExerciseModal';
+import { AuthModal } from './AuthModal';
+import { getCurrentUser } from '../lib/auth/authStore';
 import {
   Zap,
   Play,
@@ -13,6 +15,7 @@ import {
   ArrowRight,
   Flame,
   CheckCircle2,
+  Shield,
 } from 'lucide-react';
 import styles from './HomeDashboard.module.css';
 
@@ -29,18 +32,25 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
 }) => {
   const [isOnline, setIsOnline] = useState<boolean>(true);
   const [selectedGuideExercise, setSelectedGuideExercise] = useState<ExerciseGuide | null>(null);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(false);
+  const [currentUser, setCurrentUser] = useState<AuthUser | null>(null);
 
   useEffect(() => {
     setIsOnline(navigator.onLine);
+    setCurrentUser(getCurrentUser());
+
     const handleOnline = () => setIsOnline(true);
     const handleOffline = () => setIsOnline(false);
+    const handleAuthChange = () => setCurrentUser(getCurrentUser());
 
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);
+    window.addEventListener('kinetic_auth_change', handleAuthChange);
 
     return () => {
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
+      window.removeEventListener('kinetic_auth_change', handleAuthChange);
     };
   }, []);
 
@@ -74,12 +84,22 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
         </div>
 
         <div className={styles.statusArea}>
+          <button
+            type="button"
+            className={styles.authBadgeBtn}
+            onClick={() => setIsAuthModalOpen(true)}
+            title="Account & Cloud Sync Settings"
+          >
+            <Shield size={13} color={currentUser ? 'var(--accent-volt)' : 'var(--accent-cyan)'} />
+            <span>{currentUser ? currentUser.email.split('@')[0] : 'Device Sync'}</span>
+          </button>
+
           <span
             className={`badge ${isOnline ? 'badge-cyan' : 'badge-amber'}`}
             style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}
           >
             {isOnline ? <Wifi size={12} /> : <WifiOff size={12} />}
-            <span>{isOnline ? 'Cloud Synced' : 'Offline Ready'}</span>
+            <span>{isOnline ? 'Cloud' : 'Offline'}</span>
           </span>
         </div>
       </div>
@@ -176,6 +196,12 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
         exercise={selectedGuideExercise}
         onClose={() => setSelectedGuideExercise(null)}
         onAddToWorkout={(ex) => onStartNewWorkout(`${ex.name} Session`, [ex.id])}
+      />
+
+      {/* Account & Partition Auth Modal */}
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
       />
     </div>
   );

@@ -1,6 +1,21 @@
 -- Kinetic Gym D1 Relational Schema
 -- Supports idempotent Last-Write-Wins UPSERT synchronization
 
+CREATE TABLE IF NOT EXISTS users (
+    id TEXT PRIMARY KEY,
+    email TEXT UNIQUE NOT NULL,
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS magic_codes (
+    email TEXT PRIMARY KEY,
+    code TEXT NOT NULL,
+    anonymous_user_id TEXT,
+    expires_at TEXT NOT NULL,
+    created_at TEXT NOT NULL
+);
+
 CREATE TABLE IF NOT EXISTS workout_sessions (
     id TEXT PRIMARY KEY,
     user_id TEXT NOT NULL,

@@ -1,5 +1,6 @@
 import { db } from '../db';
-import type { SyncPayload, SyncResult, WorkoutSession, WorkoutSet } from '@kinetic/shared';
+import { getAuthToken, getOrCreateAnonymousUserId, getEffectiveUserId } from '../auth/authStore';
+import type { SyncPayload, SyncResult, SyncPullResponse, WorkoutSession, WorkoutSet } from '@kinetic/shared';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8787';
 
@@ -12,7 +13,24 @@ class SyncCoordinator {
         console.log('[SyncCoordinator] Device came online, triggering sync recovery.');
         this.sync();
       });
+
+      window.addEventListener('kinetic_auth_change', () => {
+        console.log('[SyncCoordinator] Auth state changed, triggering full sync & pull.');
+        this.sync().then(() => this.pull());
+      });
     }
+  }
+
+  private getAuthHeaders(): HeadersInit {
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+      'X-Client-Id': getOrCreateAnonymousUserId(),
+    };
+    const token = getAuthToken();
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+    return headers;
   }
 
   /**
@@ -54,7 +72,7 @@ class SyncCoordinator {
         .toArray();
 
       const payload: SyncPayload = {
-        client_id: 'kinetic_pwa_client',
+        client_id: getEffectiveUserId(),
         sessions,
         sets,
         last_sync_timestamp: new Date().toISOString(),
@@ -63,9 +81,7 @@ class SyncCoordinator {
       // 3. Dispatch to Cloudflare Worker
       const response = await fetch(`${API_BASE}/api/sync`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: this.getAuthHeaders(),
         body: JSON.stringify(payload),
       });
 
@@ -90,6 +106,42 @@ class SyncCoordinator {
       return null;
     } finally {
       this.isSyncing = false;
+    }
+  }
+
+  /**
+   * Pulls remote workouts from Cloudflare D1 for the authenticated user
+   */
+  public async pull(since: string = '1970-01-01T00:00:00.000Z'): Promise<boolean> {
+    if (typeof navigator !== 'undefined' && !navigator.onLine) return false;
+
+    try {
+      const response = await fetch(`${API_BASE}/api/sync?since=${encodeURIComponent(since)}`, {
+        method: 'GET',
+        headers: this.getAuthHeaders(),
+      });
+
+      if (!response.ok) return false;
+
+      const data: SyncPullResponse = await response.json();
+      const { sessions = [], sets = [] } = data;
+
+      if (sessions.length > 0 || sets.length > 0) {
+        await db.transaction('rw', db.workoutSessions, db.workoutSets, async () => {
+          if (sessions.length > 0) {
+            await db.workoutSessions.bulkPut(sessions);
+          }
+          if (sets.length > 0) {
+            await db.workoutSets.bulkPut(sets);
+          }
+        });
+        console.log(`[SyncCoordinator] Pulled ${sessions.length} sessions, ${sets.length} sets from D1 cloud.`);
+      }
+
+      return true;
+    } catch (err) {
+      console.warn('[SyncCoordinator] Pull failed', err);
+      return false;
     }
   }
 }
