@@ -152,6 +152,24 @@
   background: rgba(204, 255, 0, 0.2);
 }
 
+.strengthBtn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: var(--font-xs);
+  font-weight: 600;
+  color: var(--accent-amber);
+  background: rgba(245, 158, 11, 0.08);
+  border: 1px solid rgba(245, 158, 11, 0.25);
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  transition: all var(--transition-fast);
+}
+
+.strengthBtn:active {
+  background: rgba(245, 158, 11, 0.2);
+}
+
 /* Set Table Headers */
 .setTableHeader {
   display: grid;

@@ -1,0 +1,193 @@
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.78);
+  backdrop-filter: blur(8px);
+  z-index: var(--z-modal);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  animation: fadeIn 150ms ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.modal {
+  width: 100%;
+  max-width: 480px;
+  max-height: 88vh;
+  background: var(--bg-secondary);
+  border-top: 1px solid var(--border-medium);
+  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+  padding: var(--space-4) var(--space-4) calc(var(--space-4) + env(safe-area-inset-bottom, 12px));
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.8);
+  animation: slideUp 200ms cubic-bezier(0.16, 1, 0.3, 1);
+  overflow-y: auto;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.titleArea {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.title {
+  font-size: var(--font-lg);
+  font-weight: 800;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.subtitle {
+  font-size: var(--font-xs);
+  color: var(--text-secondary);
+}
+
+.closeBtn {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-tertiary);
+  color: var(--text-secondary);
+}
+
+/* Hero 1RM Banner */
+.heroBanner {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(204, 255, 0, 0.06));
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--space-2);
+  box-shadow: 0 0 20px rgba(245, 158, 11, 0.12);
+}
+
+.heroLabel {
+  font-size: var(--font-xs);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--accent-amber);
+}
+
+.heroValue {
+  font-family: var(--font-mono);
+  font-size: var(--font-4xl);
+  font-weight: 900;
+  color: var(--text-primary);
+  line-height: 1;
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.heroUnit {
+  font-size: var(--font-lg);
+  color: var(--accent-amber);
+  font-weight: 700;
+}
+
+.heroBasis {
+  font-size: var(--font-xs);
+  color: var(--text-secondary);
+}
+
+/* Percentage Table */
+.tableContainer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.tableHeader {
+  display: grid;
+  grid-template-columns: 50px 70px 60px 1fr;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  padding: 0 var(--space-3);
+}
+
+.tableRow {
+  display: grid;
+  grid-template-columns: 50px 70px 60px 1fr;
+  align-items: center;
+  padding: var(--space-2) var(--space-3);
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  font-size: var(--font-xs);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.tableRow:active {
+  background: var(--bg-elevated);
+  border-color: var(--accent-amber);
+  transform: scale(0.98);
+}
+
+.pctBadge {
+  font-family: var(--font-mono);
+  font-weight: 800;
+  color: var(--accent-amber);
+}
+
+.weightCell {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.repsCell {
+  font-family: var(--font-mono);
+  color: var(--text-secondary);
+}
+
+.focusCell {
+  font-size: 11px;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.warmupTip {
+  background: var(--bg-tertiary);
+  border-left: 3px solid var(--accent-cyan);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  font-size: var(--font-xs);
+  line-height: 1.4;
+  color: var(--text-secondary);
+}

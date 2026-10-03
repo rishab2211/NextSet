@@ -22,6 +22,7 @@ interface SetRowProps {
     unit: any,
     callback: (val: number) => void
   ) => void;
+  isPR?: boolean;
 }
 
 export const SetRow: React.FC<SetRowProps> = ({
@@ -31,6 +32,7 @@ export const SetRow: React.FC<SetRowProps> = ({
   onCompleteToggle,
   onOpenNumpad,
   onOpenPlateCalculator,
+  isPR = false,
 }) => {
   const cycleSetType = () => {
     const sequence: SetType[] = ['working', 'warmup', 'drop', 'myorep'];
@@ -67,6 +69,7 @@ export const SetRow: React.FC<SetRowProps> = ({
         onClick={cycleSetType}
         title="Tap to change set type (Working / Warmup / Drop / Myorep)"
       >
+        {isPR && <span className={styles.prBadge}>PR</span>}
         {getSetTypeBadge()}
       </button>
 

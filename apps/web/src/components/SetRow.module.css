@@ -36,6 +36,27 @@
   font-size: var(--font-xs);
   color: var(--text-secondary);
   cursor: pointer;
+  position: relative;
+}
+
+.prBadge {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  color: #000000;
+  font-size: 8px;
+  font-weight: 900;
+  padding: 1px 3px;
+  border-radius: 4px;
+  box-shadow: 0 0 8px rgba(245, 158, 11, 0.6);
+  animation: prGlow 1.5s infinite alternate;
+  letter-spacing: -0.02em;
+}
+
+@keyframes prGlow {
+  from { transform: scale(0.95); box-shadow: 0 0 4px rgba(245, 158, 11, 0.3); }
+  to { transform: scale(1.05); box-shadow: 0 0 10px rgba(245, 158, 11, 0.7); }
 }
 
 .setTypeWarmup {

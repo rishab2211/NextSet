@@ -19,6 +19,8 @@ import { Numpad, type NumpadMode } from './Numpad';
 import { RestTimer } from './RestTimer';
 import { ExerciseModal } from './ExerciseModal';
 import { PlateCalculatorModal } from './PlateCalculatorModal';
+import { StrengthCurveModal } from './StrengthCurveModal';
+import { checkPersonalRecord } from '../lib/strengthMath';
 import {
   CheckCircle,
   Plus,
@@ -29,6 +31,7 @@ import {
   Search,
   Dumbbell,
   Disc,
+  Trophy,
 } from 'lucide-react';
 import styles from './ActiveWorkout.module.css';
 
@@ -49,6 +52,15 @@ export const ActiveWorkout: React.FC<ActiveWorkoutProps> = ({
         .equals(session.id)
         .filter((s) => !s.deleted)
         .sortBy('set_number'),
+    [session.id]
+  ) || [];
+
+  // Historical completed sets for real-time PR detection
+  const allHistoricalSets = useLiveQuery(
+    () =>
+      db.workoutSets
+        .filter((s) => s.completed && !s.deleted && s.session_id !== session.id)
+        .toArray(),
     [session.id]
   ) || [];
 
@@ -142,6 +154,22 @@ export const ActiveWorkout: React.FC<ActiveWorkoutProps> = ({
 
   // 6. Exercise Detail Modal State
   const [modalExercise, setModalExercise] = useState<ExerciseGuide | null>(null);
+
+  // 7. 1RM & Strength Curves Modal State
+  const [strengthModalConfig, setStrengthModalConfig] = useState<{
+    isOpen: boolean;
+    exerciseName: string;
+    topWeight: number;
+    topReps: number;
+    unit: any;
+    callback?: (weight: number) => void;
+  }>({
+    isOpen: false,
+    exerciseName: '',
+    topWeight: 60,
+    topReps: 8,
+    unit: 'kg',
+  });
 
   // 6. Exercise Picker Drawer State
   const [isPickerOpen, setIsPickerOpen] = useState<boolean>(false);
@@ -308,6 +336,32 @@ export const ActiveWorkout: React.FC<ActiveWorkoutProps> = ({
                 </div>
 
                 <div style={{ display: 'flex', gap: '6px' }}>
+                  {/* 1RM Strength Curve Button */}
+                  <button
+                    type="button"
+                    className={styles.strengthBtn}
+                    onClick={() => {
+                      const topSet = [...exerciseSets].sort((a, b) => b.weight_value - a.weight_value)[0];
+                      const firstSet = exerciseSets[0];
+                      setStrengthModalConfig({
+                        isOpen: true,
+                        exerciseName: exercise ? exercise.name : exId,
+                        topWeight: topSet ? topSet.weight_value : 60,
+                        topReps: topSet ? topSet.reps : 8,
+                        unit: topSet ? topSet.weight_unit : 'kg',
+                        callback: (appliedWeight) => {
+                          if (firstSet) {
+                            updateWorkoutSet(firstSet.id, { weight_value: appliedWeight });
+                          }
+                        },
+                      });
+                    }}
+                    title="View estimated 1RM and percentage strength curves"
+                  >
+                    <Trophy size={13} />
+                    <span>1RM</span>
+                  </button>
+
                   {exercise?.category === 'barbell' && (
                     <button
                       type="button"
@@ -355,16 +409,24 @@ export const ActiveWorkout: React.FC<ActiveWorkoutProps> = ({
 
               {/* Set Rows */}
               <div className={styles.setTableList}>
-                {exerciseSets.map((st) => (
-                  <SetRow
-                    key={st.id}
-                    set={st}
-                    onUpdate={(id, updates) => updateWorkoutSet(id, updates)}
-                    onCompleteToggle={handleToggleComplete}
-                    onOpenNumpad={openNumpad}
-                    onOpenPlateCalculator={openPlateCalculator}
-                  />
-                ))}
+                {exerciseSets.map((st) => {
+                  const exHistoricalSets = allHistoricalSets.filter(
+                    (h) => h.exercise_id === st.exercise_id
+                  );
+                  const prResult = checkPersonalRecord(st, exHistoricalSets);
+
+                  return (
+                    <SetRow
+                      key={st.id}
+                      set={st}
+                      onUpdate={(id, updates) => updateWorkoutSet(id, updates)}
+                      onCompleteToggle={handleToggleComplete}
+                      onOpenNumpad={openNumpad}
+                      onOpenPlateCalculator={openPlateCalculator}
+                      isPR={prResult.isPR}
+                    />
+                  );
+                })}
               </div>
 
               {/* Add Set Button */}
@@ -500,6 +562,17 @@ export const ActiveWorkout: React.FC<ActiveWorkoutProps> = ({
       <ExerciseModal
         exercise={modalExercise}
         onClose={() => setModalExercise(null)}
+      />
+
+      {/* 1RM & Percentage Strength Curves Modal */}
+      <StrengthCurveModal
+        isOpen={strengthModalConfig.isOpen}
+        exerciseName={strengthModalConfig.exerciseName}
+        topWeight={strengthModalConfig.topWeight}
+        topReps={strengthModalConfig.topReps}
+        unit={strengthModalConfig.unit}
+        onClose={() => setStrengthModalConfig((prev) => ({ ...prev, isOpen: false }))}
+        onApplyWeight={strengthModalConfig.callback}
       />
     </div>
   );
