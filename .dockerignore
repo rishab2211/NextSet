@@ -1,0 +1,14 @@
+.git
+.gitignore
+.next
+out
+node_modules
+apps/web/node_modules
+apps/web/.next
+apps/web/out
+apps/api/node_modules
+packages/shared/node_modules
+.gemini
+dist
+build
+*.log

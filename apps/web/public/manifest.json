@@ -1,12 +1,14 @@
 {
   "name": "Kinetic — High Performance Strength & Hypertrophy PWA",
   "short_name": "Kinetic",
-  "description": "Offline-first gym tracker designed for high-stress workout environments with real-time anatomy cues and instant numeric logging.",
+  "description": "Offline-first gym tracker designed for high-stress workout environments with real-time anatomy cues, dynamic plate calculator, and instant numeric logging.",
   "start_url": "/",
+  "id": "/",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#090a0d",
+  "background_color": "#0d0f12",
   "theme_color": "#0d0f12",
+  "categories": ["fitness", "health", "lifestyle", "sports"],
   "icons": [
     {
       "src": "/icons/icon.svg",
@@ -25,6 +27,12 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
     }
   ]
 }

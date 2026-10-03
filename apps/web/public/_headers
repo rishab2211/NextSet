@@ -1,0 +1,28 @@
+# Security headers for all routes
+/*
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()
+  Cache-Control: public, max-age=0, must-revalidate
+
+# Hashed immutable static assets
+/_next/static/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Service worker: never cache so updates take effect immediately
+/sw.js
+  Cache-Control: no-cache, no-store, must-revalidate
+  Service-Worker-Allowed: /
+
+# Web App Manifest
+/manifest.json
+  Cache-Control: public, max-age=3600, must-revalidate
+  Content-Type: application/manifest+json
+
+# Brand Icons
+/icons/*
+  Cache-Control: public, max-age=604800, stale-while-revalidate=86400
+
+/favicon.ico
+  Cache-Control: public, max-age=604800, stale-while-revalidate=86400
