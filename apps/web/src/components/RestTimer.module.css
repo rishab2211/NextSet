@@ -1,0 +1,106 @@
+.dock {
+  position: fixed;
+  bottom: calc(var(--space-4) + env(safe-area-inset-bottom, 12px));
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - 32px);
+  max-width: 440px;
+  background: rgba(17, 20, 26, 0.92);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-xl);
+  padding: var(--space-3) var(--space-4);
+  box-shadow: 0 10px 35px rgba(0, 0, 0, 0.75), var(--shadow-glow-cyan);
+  z-index: var(--z-dock);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  animation: slideUp 200ms ease-out;
+}
+
+@keyframes slideUp {
+  from { transform: translate(-50%, 100%); }
+  to { transform: translate(-50%, 0); }
+}
+
+.topRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.titleArea {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.timerLabel {
+  font-size: var(--font-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-secondary);
+  font-weight: 700;
+}
+
+.countdownDisplay {
+  font-family: var(--font-mono);
+  font-size: var(--font-3xl);
+  font-weight: 800;
+  color: var(--accent-cyan);
+  line-height: 1;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.adjustBtn {
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: var(--font-xs);
+  padding: 6px 10px;
+  border-radius: var(--radius-sm);
+  transition: all var(--transition-fast);
+}
+
+.adjustBtn:active {
+  background: var(--bg-elevated);
+  transform: scale(0.95);
+}
+
+.skipBtn {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+  font-size: var(--font-xs);
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  transition: all var(--transition-fast);
+}
+
+.skipBtn:active {
+  color: var(--text-primary);
+  transform: scale(0.95);
+}
+
+.progressBar {
+  width: 100%;
+  height: 4px;
+  background: var(--bg-tertiary);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent-cyan), var(--accent-volt));
+  transition: width 1s linear;
+}

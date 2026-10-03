@@ -1,0 +1,111 @@
+.row {
+  display: grid;
+  grid-template-columns: 36px 1fr 76px 64px 44px;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  transition: all var(--transition-fast);
+  min-height: 52px;
+}
+
+.rowCompleted {
+  background: rgba(16, 185, 129, 0.08);
+  border-color: rgba(16, 185, 129, 0.25);
+  animation: snapPulse 180ms ease-out;
+}
+
+@keyframes snapPulse {
+  0% { transform: scale(0.97); }
+  60% { transform: scale(1.02); }
+  100% { transform: scale(1); }
+}
+
+.setIndicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-elevated);
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: var(--font-xs);
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.setTypeWarmup {
+  color: var(--accent-amber);
+  background: rgba(245, 158, 11, 0.15);
+}
+
+.setTypeDrop {
+  color: #c084fc;
+  background: rgba(192, 132, 252, 0.15);
+}
+
+.prevPerf {
+  font-size: var(--font-xs);
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.valuePill {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  height: 38px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 0 var(--space-2);
+  font-family: var(--font-mono);
+  font-size: var(--font-sm);
+  font-weight: 700;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  user-select: none;
+}
+
+.valuePill:active {
+  background: var(--bg-elevated);
+  border-color: var(--accent-cyan);
+}
+
+.valuePillEmpty {
+  color: var(--text-muted);
+}
+
+.checkBtn {
+  width: 42px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-medium);
+  color: var(--text-muted);
+  transition: all var(--transition-fast);
+  cursor: pointer;
+}
+
+.checkBtn:active {
+  transform: scale(0.9);
+}
+
+.checkBtnCompleted {
+  background: var(--success);
+  border-color: var(--success);
+  color: #ffffff;
+  box-shadow: 0 0 12px var(--success-glow);
+}
