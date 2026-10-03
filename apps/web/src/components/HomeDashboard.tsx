@@ -75,7 +75,7 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
           <div className={styles.logoIcon}>
             <Dumbbell size={18} color="var(--accent-primary)" />
           </div>
-          <div className={styles.logoText}>NEXTSET</div>
+          <div className={styles.logoText}>NextSet</div>
         </div>
 
         <div className={styles.statusArea}>
