@@ -13,6 +13,8 @@
     "build": "npm run build:web",
     "build:web": "npm run build --workspace=apps/web",
     "build:api": "npm run build --workspace=apps/api",
+    "deploy": "npm run deploy:api:prod && npm run deploy:web",
+    "deploy:web": "npm run deploy --workspace=apps/web",
     "deploy:api": "npm run deploy --workspace=apps/api",
     "deploy:api:prod": "npm run deploy:prod --workspace=apps/api",
     "typecheck": "npm run typecheck --workspaces --if-present",

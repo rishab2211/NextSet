@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev -p 3000",
     "build": "next build",
+    "deploy": "next build && wrangler pages deploy out --project-name nextset --commit-dirty=true",
     "start": "next start",
     "typecheck": "tsc --noEmit"
   },
