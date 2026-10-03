@@ -131,6 +131,9 @@ export interface RestTimerState {
 export interface AuthUser {
   id: string;
   email: string;
+  name?: string;
+  unit_preference?: 'kg' | 'lbs';
+  barbell_weight?: number;
   is_anonymous: boolean;
   created_at: string;
 }
@@ -149,4 +152,39 @@ export interface VerifyOtpRequest {
   email: string;
   code: string;
   anonymous_user_id?: string;
+}
+
+export interface SignUpRequest {
+  email: string;
+  password: string;
+  name?: string;
+  unit_preference?: 'kg' | 'lbs';
+  barbell_weight?: number;
+  anonymous_user_id?: string;
+}
+
+export interface SignInRequest {
+  email: string;
+  password: string;
+  anonymous_user_id?: string;
+}
+
+export interface UpdateProfileRequest {
+  name?: string;
+  unit_preference?: 'kg' | 'lbs';
+  barbell_weight?: number;
+}
+
+export interface ChangePasswordRequest {
+  current_password: string;
+  new_password: string;
+}
+
+export interface UserStats {
+  total_workouts: number;
+  total_sets: number;
+  total_reps: number;
+  total_volume_kg: number;
+  pr_count: number;
+  last_workout_date?: string;
 }

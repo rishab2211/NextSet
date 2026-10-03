@@ -4,6 +4,11 @@
 CREATE TABLE IF NOT EXISTS users (
     id TEXT PRIMARY KEY,
     email TEXT UNIQUE NOT NULL,
+    password_hash TEXT,
+    password_salt TEXT,
+    name TEXT,
+    unit_preference TEXT NOT NULL DEFAULT 'kg',
+    barbell_weight REAL NOT NULL DEFAULT 20.0,
     created_at TEXT NOT NULL,
     updated_at TEXT NOT NULL
 );

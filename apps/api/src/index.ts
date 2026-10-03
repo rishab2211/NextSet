@@ -8,10 +8,15 @@ import type {
   WorkoutSet,
   MagicLinkRequest,
   VerifyOtpRequest,
+  SignUpRequest,
+  SignInRequest,
+  UpdateProfileRequest,
+  ChangePasswordRequest,
+  UserStats,
   AuthTokenResponse,
   AuthUser,
 } from '@kinetic/shared';
-import { signJwt, verifyJwt, generateOtp } from './auth';
+import { signJwt, verifyJwt, generateOtp, hashPassword, verifyPassword, generateSalt } from './auth';
 
 type Bindings = {
   DB: D1Database;
@@ -194,11 +199,380 @@ app.post('/api/auth/otp/verify', async (c) => {
 });
 
 /**
+ * POST /api/auth/signup
+ * Create account with Email, Password, Name, and initial Preferences
+ */
+app.post('/api/auth/signup', async (c) => {
+  try {
+    const body = await c.req.json<SignUpRequest>();
+    const { email, password, name, unit_preference = 'kg', barbell_weight = 20, anonymous_user_id } = body;
+    const db = c.env.DB;
+    const secret = c.env.JWT_SECRET || DEFAULT_SECRET;
+
+    if (!email || !email.includes('@')) {
+      return c.json({ error: 'Valid email address required' }, 400);
+    }
+    if (!password || password.length < 6) {
+      return c.json({ error: 'Password must be at least 6 characters' }, 400);
+    }
+
+    const lowerEmail = email.toLowerCase().trim();
+    const now = new Date().toISOString();
+    const salt = generateSalt();
+    const passwordHash = await hashPassword(password, salt);
+
+    if (db) {
+      // Check existing user
+      const existing = await db.prepare(`SELECT * FROM users WHERE email = ?`).bind(lowerEmail).first<any>();
+      if (existing && existing.password_hash) {
+        return c.json({ error: 'An account with this email already exists. Please sign in.' }, 409);
+      }
+
+      let userId = existing ? existing.id : 'usr_' + crypto.randomUUID().substring(0, 18);
+
+      if (existing) {
+        // Upgrade existing passwordless/OTP user with password & name
+        await db.prepare(`
+          UPDATE users SET
+            password_hash = ?,
+            password_salt = ?,
+            name = COALESCE(?, name),
+            unit_preference = ?,
+            barbell_weight = ?,
+            updated_at = ?
+          WHERE id = ?
+        `).bind(passwordHash, salt, name || null, unit_preference, barbell_weight, now, userId).run();
+      } else {
+        await db.prepare(`
+          INSERT INTO users (id, email, password_hash, password_salt, name, unit_preference, barbell_weight, created_at, updated_at)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        `).bind(userId, lowerEmail, passwordHash, salt, name || null, unit_preference, barbell_weight, now, now).run();
+      }
+
+      // Reassign any anonymous device workouts if provided
+      if (anonymous_user_id && anonymous_user_id !== userId) {
+        await db.prepare(`
+          UPDATE workout_sessions SET user_id = ?, updated_at = ?
+          WHERE user_id = ?
+        `).bind(userId, now, anonymous_user_id).run();
+      }
+
+      const user: AuthUser = {
+        id: userId,
+        email: lowerEmail,
+        name: name || undefined,
+        unit_preference,
+        barbell_weight,
+        is_anonymous: false,
+        created_at: existing ? existing.created_at : now,
+      };
+
+      const token = await signJwt({
+        sub: user.id,
+        email: user.email,
+        name: user.name,
+        exp: Math.floor(Date.now() / 1000) + 30 * 24 * 60 * 60,
+      }, secret);
+
+      return c.json({ token, user } as AuthTokenResponse);
+    } else {
+      // Mock / fallback
+      const mockUserId = 'usr_' + Math.random().toString(36).substring(2, 10);
+      const user: AuthUser = {
+        id: mockUserId,
+        email: lowerEmail,
+        name: name || undefined,
+        unit_preference,
+        barbell_weight,
+        is_anonymous: false,
+        created_at: now,
+      };
+      const token = await signJwt({
+        sub: mockUserId,
+        email: lowerEmail,
+        name,
+        exp: Math.floor(Date.now() / 1000) + 30 * 24 * 60 * 60,
+      }, secret);
+      return c.json({ token, user } as AuthTokenResponse);
+    }
+  } catch (err: any) {
+    return c.json({ error: err.message }, 500);
+  }
+});
+
+/**
+ * POST /api/auth/login
+ * Sign in with email and password
+ */
+app.post('/api/auth/login', async (c) => {
+  try {
+    const body = await c.req.json<SignInRequest>();
+    const { email, password, anonymous_user_id } = body;
+    const db = c.env.DB;
+    const secret = c.env.JWT_SECRET || DEFAULT_SECRET;
+
+    if (!email || !password) {
+      return c.json({ error: 'Email and password are required' }, 400);
+    }
+
+    const lowerEmail = email.toLowerCase().trim();
+    const now = new Date().toISOString();
+
+    if (db) {
+      const userRecord = await db.prepare(`SELECT * FROM users WHERE email = ?`).bind(lowerEmail).first<any>();
+      if (!userRecord) {
+        return c.json({ error: 'Invalid email or password' }, 401);
+      }
+
+      if (!userRecord.password_hash || !userRecord.password_salt) {
+        return c.json({
+          error: 'This account was created via Magic Link / OTP. Please use OTP to sign in or reset your password.',
+        }, 400);
+      }
+
+      const isValid = await verifyPassword(password, userRecord.password_hash, userRecord.password_salt);
+      if (!isValid) {
+        return c.json({ error: 'Invalid email or password' }, 401);
+      }
+
+      // Link anonymous workouts if requested
+      if (anonymous_user_id && anonymous_user_id !== userRecord.id) {
+        await db.prepare(`
+          UPDATE workout_sessions SET user_id = ?, updated_at = ?
+          WHERE user_id = ?
+        `).bind(userRecord.id, now, anonymous_user_id).run();
+      }
+
+      const user: AuthUser = {
+        id: userRecord.id,
+        email: userRecord.email,
+        name: userRecord.name || undefined,
+        unit_preference: userRecord.unit_preference || 'kg',
+        barbell_weight: userRecord.barbell_weight || 20,
+        is_anonymous: false,
+        created_at: userRecord.created_at,
+      };
+
+      const token = await signJwt({
+        sub: user.id,
+        email: user.email,
+        name: user.name,
+        exp: Math.floor(Date.now() / 1000) + 30 * 24 * 60 * 60,
+      }, secret);
+
+      return c.json({ token, user } as AuthTokenResponse);
+    } else {
+      // Mock / fallback
+      const mockUserId = 'usr_' + Math.random().toString(36).substring(2, 10);
+      const user: AuthUser = {
+        id: mockUserId,
+        email: lowerEmail,
+        name: 'Lifter',
+        unit_preference: 'kg',
+        barbell_weight: 20,
+        is_anonymous: false,
+        created_at: now,
+      };
+      const token = await signJwt({
+        sub: mockUserId,
+        email: lowerEmail,
+        exp: Math.floor(Date.now() / 1000) + 30 * 24 * 60 * 60,
+      }, secret);
+      return c.json({ token, user } as AuthTokenResponse);
+    }
+  } catch (err: any) {
+    return c.json({ error: err.message }, 500);
+  }
+});
+
+/**
+ * PUT /api/auth/profile
+ * Update user display name, unit preference, barbell weight
+ */
+app.put('/api/auth/profile', async (c) => {
+  try {
+    const { userId, isAuth } = await resolveUserId(c);
+    if (!isAuth) {
+      return c.json({ error: 'Unauthorized' }, 401);
+    }
+
+    const body = await c.req.json<UpdateProfileRequest>();
+    const { name, unit_preference, barbell_weight } = body;
+    const db = c.env.DB;
+    const now = new Date().toISOString();
+
+    if (db) {
+      await db.prepare(`
+        UPDATE users SET
+          name = COALESCE(?, name),
+          unit_preference = COALESCE(?, unit_preference),
+          barbell_weight = COALESCE(?, barbell_weight),
+          updated_at = ?
+        WHERE id = ?
+      `).bind(name ?? null, unit_preference ?? null, barbell_weight ?? null, now, userId).run();
+
+      const updated = await db.prepare(`SELECT * FROM users WHERE id = ?`).bind(userId).first<any>();
+      const user: AuthUser = {
+        id: updated.id,
+        email: updated.email,
+        name: updated.name || undefined,
+        unit_preference: updated.unit_preference || 'kg',
+        barbell_weight: updated.barbell_weight || 20,
+        is_anonymous: false,
+        created_at: updated.created_at,
+      };
+      return c.json({ success: true, user });
+    } else {
+      return c.json({
+        success: true,
+        user: {
+          id: userId,
+          email: 'user@example.com',
+          name,
+          unit_preference: unit_preference || 'kg',
+          barbell_weight: barbell_weight || 20,
+          is_anonymous: false,
+          created_at: now,
+        },
+      });
+    }
+  } catch (err: any) {
+    return c.json({ error: err.message }, 500);
+  }
+});
+
+/**
+ * POST /api/auth/change-password
+ * Securely update password with current password verification
+ */
+app.post('/api/auth/change-password', async (c) => {
+  try {
+    const { userId, isAuth } = await resolveUserId(c);
+    if (!isAuth) {
+      return c.json({ error: 'Unauthorized' }, 401);
+    }
+
+    const body = await c.req.json<ChangePasswordRequest>();
+    const { current_password, new_password } = body;
+    const db = c.env.DB;
+
+    if (!new_password || new_password.length < 6) {
+      return c.json({ error: 'New password must be at least 6 characters' }, 400);
+    }
+
+    if (db) {
+      const user = await db.prepare(`SELECT * FROM users WHERE id = ?`).bind(userId).first<any>();
+      if (!user) {
+        return c.json({ error: 'User not found' }, 404);
+      }
+
+      if (user.password_hash && user.password_salt) {
+        const isValid = await verifyPassword(current_password, user.password_hash, user.password_salt);
+        if (!isValid) {
+          return c.json({ error: 'Current password is incorrect' }, 400);
+        }
+      }
+
+      const newSalt = generateSalt();
+      const newHash = await hashPassword(new_password, newSalt);
+      const now = new Date().toISOString();
+
+      await db.prepare(`
+        UPDATE users SET
+          password_hash = ?,
+          password_salt = ?,
+          updated_at = ?
+        WHERE id = ?
+      `).bind(newHash, newSalt, now, userId).run();
+
+      return c.json({ success: true, message: 'Password changed successfully' });
+    } else {
+      return c.json({ success: true, message: 'Password changed successfully' });
+    }
+  } catch (err: any) {
+    return c.json({ error: err.message }, 500);
+  }
+});
+
+/**
+ * GET /api/auth/stats
+ * Aggregate cloud workout statistics for user profile
+ */
+app.get('/api/auth/stats', async (c) => {
+  try {
+    const { userId, isAuth } = await resolveUserId(c);
+    const db = c.env.DB;
+
+    if (db) {
+      const sessionCount = await db.prepare(`
+        SELECT COUNT(*) as count FROM workout_sessions WHERE user_id = ? AND deleted = 0
+      `).bind(userId).first<{ count: number }>();
+
+      const setCount = await db.prepare(`
+        SELECT COUNT(*) as count, SUM(reps) as total_reps, SUM(weight_value * reps) as total_volume
+        FROM workout_sets s
+        JOIN workout_sessions w ON s.session_id = w.id
+        WHERE w.user_id = ? AND s.deleted = 0 AND s.completed = 1
+      `).bind(userId).first<{ count: number; total_reps: number; total_volume: number }>();
+
+      const lastWorkout = await db.prepare(`
+        SELECT started_at FROM workout_sessions
+        WHERE user_id = ? AND deleted = 0
+        ORDER BY started_at DESC LIMIT 1
+      `).bind(userId).first<{ started_at: string }>();
+
+      const stats: UserStats = {
+        total_workouts: sessionCount?.count || 0,
+        total_sets: setCount?.count || 0,
+        total_reps: setCount?.total_reps || 0,
+        total_volume_kg: Math.round(setCount?.total_volume || 0),
+        pr_count: 0,
+        last_workout_date: lastWorkout?.started_at,
+      };
+
+      return c.json(stats);
+    } else {
+      const stats: UserStats = {
+        total_workouts: 0,
+        total_sets: 0,
+        total_reps: 0,
+        total_volume_kg: 0,
+        pr_count: 0,
+      };
+      return c.json(stats);
+    }
+  } catch (err: any) {
+    return c.json({ error: err.message }, 500);
+  }
+});
+
+/**
  * GET /api/auth/me
  * Returns current authenticated profile
  */
 app.get('/api/auth/me', async (c) => {
   const { userId, isAuth } = await resolveUserId(c);
+  const db = c.env.DB;
+
+  if (isAuth && db) {
+    const user = await db.prepare(`SELECT id, email, name, unit_preference, barbell_weight, created_at FROM users WHERE id = ?`).bind(userId).first<any>();
+    if (user) {
+      return c.json({
+        user_id: userId,
+        authenticated: true,
+        user: {
+          id: user.id,
+          email: user.email,
+          name: user.name || undefined,
+          unit_preference: user.unit_preference || 'kg',
+          barbell_weight: user.barbell_weight || 20,
+          is_anonymous: false,
+          created_at: user.created_at,
+        },
+      });
+    }
+  }
+
   return c.json({
     user_id: userId,
     authenticated: isAuth,

@@ -93,3 +93,53 @@ export function generateOtp(): string {
   crypto.getRandomValues(array);
   return (100000 + (array[0] % 900000)).toString();
 }
+
+/**
+ * Generates a cryptographically random salt for PBKDF2
+ */
+export function generateSalt(): string {
+  const bytes = new Uint8Array(16);
+  crypto.getRandomValues(bytes);
+  return Array.from(bytes).map((b) => b.toString(16).padStart(2, '0')).join('');
+}
+
+/**
+ * Edge-native password hashing using PBKDF2-HMAC-SHA256 (100k iterations)
+ */
+export async function hashPassword(password: string, salt: string): Promise<string> {
+  const enc = new TextEncoder();
+  const passwordKey = await crypto.subtle.importKey(
+    'raw',
+    enc.encode(password),
+    { name: 'PBKDF2' },
+    false,
+    ['deriveBits']
+  );
+
+  const derivedBits = await crypto.subtle.deriveBits(
+    {
+      name: 'PBKDF2',
+      salt: enc.encode(salt),
+      iterations: 100000,
+      hash: 'SHA-256',
+    },
+    passwordKey,
+    256 // 256 bits = 32 bytes
+  );
+
+  const derivedBytes = new Uint8Array(derivedBits);
+  return Array.from(derivedBytes).map((b) => b.toString(16).padStart(2, '0')).join('');
+}
+
+/**
+ * Constant-time verification of password against salt and stored hash
+ */
+export async function verifyPassword(password: string, hash: string, salt: string): Promise<boolean> {
+  const computedHash = await hashPassword(password, salt);
+  if (computedHash.length !== hash.length) return false;
+  let result = 0;
+  for (let i = 0; i < computedHash.length; i++) {
+    result |= computedHash.charCodeAt(i) ^ hash.charCodeAt(i);
+  }
+  return result === 0;
+}

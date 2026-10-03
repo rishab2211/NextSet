@@ -91,7 +91,7 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
             title="Account & Cloud Sync Settings"
           >
             <Shield size={13} color={currentUser ? 'var(--accent-volt)' : 'var(--accent-cyan)'} />
-            <span>{currentUser ? currentUser.email.split('@')[0] : 'Device Sync'}</span>
+            <span>{currentUser ? (currentUser.name || currentUser.email.split('@')[0]) : 'Sign In / Sync'}</span>
           </button>
 
           <span
