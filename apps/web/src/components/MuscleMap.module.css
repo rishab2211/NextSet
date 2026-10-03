@@ -1,0 +1,123 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+  width: 100%;
+  padding: var(--space-4);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+}
+
+.viewSelector {
+  display: flex;
+  background: var(--bg-tertiary);
+  padding: 3px;
+  border-radius: var(--radius-full);
+  gap: 4px;
+}
+
+.viewBtn {
+  padding: 6px 16px;
+  font-size: var(--font-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-secondary);
+  border-radius: var(--radius-full);
+  transition: all var(--transition-fast);
+}
+
+.viewBtnActive {
+  background: var(--bg-elevated);
+  color: var(--accent-cyan);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+.svgWrapper {
+  width: 100%;
+  max-width: 260px;
+  height: 320px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.anatomySvg {
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.5));
+}
+
+.baseBody {
+  fill: #1a202c;
+  stroke: #2d3748;
+  stroke-width: 1.5;
+  stroke-linejoin: round;
+  transition: fill var(--transition-normal);
+}
+
+.musclePart {
+  fill: #273142;
+  stroke: #161c26;
+  stroke-width: 1;
+  cursor: pointer;
+  transition: fill var(--transition-fast), filter var(--transition-fast);
+}
+
+.musclePart:hover {
+  fill: #3a475d;
+}
+
+.primaryActive {
+  fill: var(--accent-cyan) !important;
+  filter: drop-shadow(0 0 8px var(--accent-cyan-glow));
+}
+
+.secondaryActive {
+  fill: var(--accent-volt) !important;
+  filter: drop-shadow(0 0 6px var(--accent-volt-glow));
+}
+
+.musclePartSelected {
+  stroke: #ffffff;
+  stroke-width: 2;
+}
+
+.legend {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  font-size: var(--font-xs);
+  color: var(--text-secondary);
+}
+
+.legendItem {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.dotPrimary {
+  width: 10px;
+  height: 10px;
+  border-radius: var(--radius-full);
+  background: var(--accent-cyan);
+  box-shadow: 0 0 6px var(--accent-cyan);
+}
+
+.dotSecondary {
+  width: 10px;
+  height: 10px;
+  border-radius: var(--radius-full);
+  background: var(--accent-volt);
+  box-shadow: 0 0 6px var(--accent-volt);
+}
+
+.selectedBadge {
+  margin-top: var(--space-2);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
