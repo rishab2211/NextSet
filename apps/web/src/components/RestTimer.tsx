@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Timer, X } from 'lucide-react';
 import { soundFx } from '../lib/audio';
+import { getWorkoutPreferences } from '../lib/themeStore';
 import styles from './RestTimer.module.css';
 
 interface RestTimerProps {
@@ -33,15 +34,27 @@ export const RestTimer: React.FC<RestTimerProps> = ({
       const remSec = Math.max(0, Math.ceil(remainingMs / 1000));
       setSecondsRemaining(remSec);
 
+      const prefs = getWorkoutPreferences();
+
       // Warning ticks at T-3, T-2, T-1
       if ([3, 2, 1].includes(remSec) && !playedWarningSeconds.current.has(remSec)) {
         playedWarningSeconds.current.add(remSec);
-        soundFx.playTick();
+        if (prefs.timerSound) {
+          soundFx.playTick();
+        }
+        if (prefs.hapticFeedback && typeof navigator !== 'undefined' && 'vibrate' in navigator) {
+          navigator.vibrate(50);
+        }
       }
 
       // Finish at T-0
       if (remainingMs <= 0) {
-        soundFx.playChime();
+        if (prefs.timerSound) {
+          soundFx.playChime();
+        }
+        if (prefs.hapticFeedback && typeof navigator !== 'undefined' && 'vibrate' in navigator) {
+          navigator.vibrate([150, 80, 150]);
+        }
         onFinish();
       }
     };

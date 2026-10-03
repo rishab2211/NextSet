@@ -26,9 +26,10 @@
   --text-inverse: #0f1013;
 
   /* Athletic Accents - Confident & Functional, Zero Neon Cliché */
-  --accent-primary: #f97316;        /* Athletic Amber / Safety Orange */
-  --accent-primary-hover: #ea580c;
-  --accent-primary-subtle: rgba(249, 115, 22, 0.12);
+  --accent-primary: #ef4444;        /* Iron Crimson (Default) */
+  --accent-primary-hover: #dc2626;
+  --accent-primary-subtle: rgba(239, 68, 68, 0.15);
+  --text-accent-contrast: #ffffff;
 
   --accent-cyan: #38bdf8;           /* Clean Sky Cyan */
   --accent-cyan-dark: #0284c7;

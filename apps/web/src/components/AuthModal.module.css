@@ -283,9 +283,9 @@
 }
 
 .segmentBtnActive {
-  background: var(--accent-cyan);
-  color: var(--text-inverse);
-  box-shadow: var(--shadow-glow-cyan);
+  background: var(--accent-primary);
+  color: var(--text-accent-contrast);
+  box-shadow: none;
 }
 
 /* User Profile Header */
@@ -303,15 +303,16 @@
   width: 52px;
   height: 52px;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--accent-cyan), var(--accent-volt));
-  color: var(--text-inverse);
+  background: var(--surface-3);
+  color: var(--accent-primary);
+  border: 1px solid var(--border-medium);
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: var(--font-lg);
   font-weight: 900;
   flex-shrink: 0;
-  box-shadow: var(--shadow-glow-cyan);
+  box-shadow: none;
 }
 
 .profileInfo {

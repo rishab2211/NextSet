@@ -65,7 +65,7 @@ export const PlateCalculatorModal: React.FC<PlateCalculatorModalProps> = ({
         <div className={styles.header}>
           <div className={styles.titleArea}>
             <div className={styles.title}>
-              <Disc size={20} color="var(--accent-cyan)" />
+              <Disc size={20} color="var(--accent-primary)" />
               <span>Barbell Plate Calculator</span>
             </div>
             <div className={styles.subtitle}>

@@ -21,6 +21,8 @@ import { PlateCalculatorModal } from './PlateCalculatorModal';
 import { StrengthCurveModal } from './StrengthCurveModal';
 import { ExerciseSwapModal } from './ExerciseSwapModal';
 import { checkPersonalRecord } from '../lib/strengthMath';
+import { getWorkoutPreferences } from '../lib/themeStore';
+import { getUnitPreference } from '../lib/auth/authStore';
 import {
   Check,
   Plus,
@@ -115,11 +117,12 @@ export const ActiveWorkout: React.FC<ActiveWorkoutProps> = ({
 
   // 3. Rest Timer State
   const [restTarget, setRestTarget] = useState<number | null>(null);
-  const [restDuration, setRestDuration] = useState<number>(90);
+  const [restDuration, setRestDuration] = useState<number>(() => getWorkoutPreferences().defaultRestSeconds);
 
-  const startRestTimer = (seconds: number = 90) => {
-    setRestDuration(seconds);
-    setRestTarget(Date.now() + seconds * 1000);
+  const startRestTimer = (seconds?: number) => {
+    const dur = seconds ?? getWorkoutPreferences().defaultRestSeconds;
+    setRestDuration(dur);
+    setRestTarget(Date.now() + dur * 1000);
   };
 
   const handleAdjustTimer = (deltaSec: number) => {
@@ -237,7 +240,10 @@ export const ActiveWorkout: React.FC<ActiveWorkoutProps> = ({
     await updateWorkoutSet(set.id, { completed: nextCompleted });
 
     if (nextCompleted) {
-      startRestTimer(90);
+      const prefs = getWorkoutPreferences();
+      if (prefs.timerAutoStart) {
+        startRestTimer(prefs.defaultRestSeconds);
+      }
     }
   };
 
@@ -263,7 +269,7 @@ export const ActiveWorkout: React.FC<ActiveWorkoutProps> = ({
         ? targetPrev.reps
         : 10;
 
-    const initialUnit = lastSet ? lastSet.weight_unit : targetPrev ? targetPrev.weight_unit : 'kg';
+    const initialUnit = lastSet ? lastSet.weight_unit : targetPrev ? targetPrev.weight_unit : getUnitPreference();
 
     await addWorkoutSet({
       sessionId: session.id,
@@ -288,7 +294,7 @@ export const ActiveWorkout: React.FC<ActiveWorkoutProps> = ({
       exerciseId: exercise.id,
       setNumber: 1,
       weightValue: firstPrev ? firstPrev.weight_value : 0,
-      weightUnit: firstPrev ? firstPrev.weight_unit : 'kg',
+      weightUnit: firstPrev ? firstPrev.weight_unit : getUnitPreference(),
       reps: firstPrev ? firstPrev.reps : exercise.recommendedRepRange.min || 8,
       setType: 'working',
     });

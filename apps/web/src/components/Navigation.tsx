@@ -1,10 +1,10 @@
 'use client';
 
 import React from 'react';
-import { Dumbbell, BookOpen, History } from 'lucide-react';
+import { Dumbbell, BookOpen, History, Settings } from 'lucide-react';
 import styles from './Navigation.module.css';
 
-export type NavTab = 'workout' | 'exercises' | 'history';
+export type NavTab = 'workout' | 'exercises' | 'history' | 'settings';
 
 interface NavigationProps {
   currentTab: NavTab;
@@ -32,7 +32,7 @@ export const Navigation: React.FC<NavigationProps> = ({
         onClick={() => onTabChange('exercises')}
       >
         <BookOpen size={22} />
-        <span>Anatomy & Form</span>
+        <span>Anatomy</span>
       </button>
 
       <button
@@ -42,6 +42,15 @@ export const Navigation: React.FC<NavigationProps> = ({
       >
         <History size={22} />
         <span>History</span>
+      </button>
+
+      <button
+        type="button"
+        className={`${styles.navItem} ${currentTab === 'settings' ? styles.navItemActive : ''}`}
+        onClick={() => onTabChange('settings')}
+      >
+        <Settings size={22} />
+        <span>Settings</span>
       </button>
     </nav>
   );

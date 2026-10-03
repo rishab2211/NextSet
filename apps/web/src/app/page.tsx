@@ -1,19 +1,25 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../lib/db';
 import { startWorkoutSession, addWorkoutSet } from '../lib/db/workoutStore';
+import { applyThemeToDOM } from '../lib/themeStore';
 import { HomeDashboard } from '../components/HomeDashboard';
 import { ActiveWorkout } from '../components/ActiveWorkout';
 import { ExerciseExplorer } from '../components/ExerciseExplorer';
 import { WorkoutHistory } from '../components/WorkoutHistory';
+import { SettingsPage } from '../components/SettingsPage';
 import { Navigation, type NavTab } from '../components/Navigation';
 import { getExerciseById } from '../data/exercises';
 
 export default function KineticApp() {
   const [currentTab, setCurrentTab] = useState<NavTab>('workout');
   const [inActiveWorkoutView, setInActiveWorkoutView] = useState<boolean>(false);
+
+  useEffect(() => {
+    applyThemeToDOM();
+  }, []);
 
   // Live Query for active workout session
   const activeSession = useLiveQuery(
@@ -72,6 +78,8 @@ export default function KineticApp() {
           )}
 
           {currentTab === 'history' && <WorkoutHistory />}
+
+          {currentTab === 'settings' && <SettingsPage />}
 
           {/* Bottom Navigation */}
           <Navigation currentTab={currentTab} onTabChange={setCurrentTab} />

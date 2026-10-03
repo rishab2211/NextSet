@@ -95,3 +95,16 @@ test('strengthMath: checkPersonalRecord identifies new PR', () => {
   assert.strictEqual(res.isPR, true);
   assert.strictEqual(res.is1RMPR, true);
 });
+
+test('themeStore: ACCENT_PRESETS contains valid hex codes and 6 presets', async () => {
+  const { ACCENT_PRESETS } = await import('./themeStore.ts');
+  assert.strictEqual(ACCENT_PRESETS.length, 6);
+  for (const preset of ACCENT_PRESETS) {
+    assert.match(preset.hex, /^#[0-9a-fA-F]{6}$/);
+    assert.ok(preset.name.length > 0);
+  }
+  // Crimson is Iron Crimson default
+  const crimson = ACCENT_PRESETS.find((p) => p.id === 'crimson');
+  assert.ok(crimson);
+  assert.strictEqual(crimson.hex, '#ef4444');
+});
