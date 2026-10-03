@@ -19,8 +19,8 @@ COPY apps/web ./apps/web
 # Optional build arg for pointing to production API
 ARG NEXT_PUBLIC_API_URL
 ARG NEXT_PUBLIC_APP_URL
-ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-https://api.nextset.app}
-ENV NEXT_PUBLIC_APP_URL=${NEXT_PUBLIC_APP_URL:-https://nextset.app}
+ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-https://nextset-api-production.rishabraj2211.workers.dev}
+ENV NEXT_PUBLIC_APP_URL=${NEXT_PUBLIC_APP_URL:-https://nextset-4u3.pages.dev}
 
 # Build static PWA export
 RUN npm run build:web

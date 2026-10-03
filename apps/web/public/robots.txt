@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://nextset.pages.dev/sitemap.xml
+Sitemap: https://nextset-4u3.pages.dev/sitemap.xml

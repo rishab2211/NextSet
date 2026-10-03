@@ -4,7 +4,7 @@ import '../styles/tokens.css';
 import '../styles/globals.css';
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'https://nextset.pages.dev'),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'https://nextset-4u3.pages.dev'),
   title: 'NextSet — High Performance Strength & Hypertrophy PWA',
   description: 'Mobile-first, offline-first gym tracking designed for high-stress gym environments with real-time anatomy cues and instant numeric logging.',
   manifest: '/manifest.json',
