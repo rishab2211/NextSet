@@ -14,6 +14,7 @@ interface NumpadProps {
   title?: string;
   onConfirm: (value: number) => void;
   onClose: () => void;
+  onOpenPlateCalculator?: (currentVal: number) => void;
 }
 
 export const Numpad: React.FC<NumpadProps> = ({
@@ -24,6 +25,7 @@ export const Numpad: React.FC<NumpadProps> = ({
   title,
   onConfirm,
   onClose,
+  onOpenPlateCalculator,
 }) => {
   const [currentStr, setCurrentStr] = useState<string>('');
 
@@ -82,6 +84,20 @@ export const Numpad: React.FC<NumpadProps> = ({
 
         {/* Quick Increment Buttons */}
         <div className={styles.quickBar}>
+          {mode === 'weight' && onOpenPlateCalculator && (
+            <button
+              type="button"
+              className={styles.quickBtn}
+              style={{ color: 'var(--accent-volt)', borderColor: 'rgba(204, 255, 0, 0.3)', flex: '1.3' }}
+              onClick={() => {
+                const val = parseFloat(currentStr) || initialValue || 20;
+                onClose();
+                onOpenPlateCalculator(val);
+              }}
+            >
+              Plates 🏋️
+            </button>
+          )}
           {quickIncrements.map((inc) => (
             <button
               key={inc}

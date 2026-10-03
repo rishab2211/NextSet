@@ -18,6 +18,7 @@ import { SetRow } from './SetRow';
 import { Numpad, type NumpadMode } from './Numpad';
 import { RestTimer } from './RestTimer';
 import { ExerciseModal } from './ExerciseModal';
+import { PlateCalculatorModal } from './PlateCalculatorModal';
 import {
   CheckCircle,
   Plus,
@@ -27,6 +28,7 @@ import {
   X,
   Search,
   Dumbbell,
+  Disc,
 } from 'lucide-react';
 import styles from './ActiveWorkout.module.css';
 
@@ -112,7 +114,33 @@ export const ActiveWorkout: React.FC<ActiveWorkoutProps> = ({
     });
   };
 
-  // 5. Exercise Detail Modal State
+  // 5. Plate Calculator State
+  const [plateCalcConfig, setPlateCalcConfig] = useState<{
+    isOpen: boolean;
+    initialWeight: number;
+    unit: any;
+    callback: (val: number) => void;
+  }>({
+    isOpen: false,
+    initialWeight: 20,
+    unit: 'kg',
+    callback: () => {},
+  });
+
+  const openPlateCalculator = (
+    initialWeight: number,
+    unit: any,
+    callback: (val: number) => void
+  ) => {
+    setPlateCalcConfig({
+      isOpen: true,
+      initialWeight: initialWeight > 0 ? initialWeight : 20,
+      unit: unit || 'kg',
+      callback,
+    });
+  };
+
+  // 6. Exercise Detail Modal State
   const [modalExercise, setModalExercise] = useState<ExerciseGuide | null>(null);
 
   // 6. Exercise Picker Drawer State
@@ -279,16 +307,41 @@ export const ActiveWorkout: React.FC<ActiveWorkoutProps> = ({
                   </div>
                 </div>
 
-                {exercise && (
-                  <button
-                    type="button"
-                    className={styles.guideBtn}
-                    onClick={() => setModalExercise(exercise)}
-                  >
-                    <BookOpen size={13} />
-                    <span>Form Guide</span>
-                  </button>
-                )}
+                <div style={{ display: 'flex', gap: '6px' }}>
+                  {exercise?.category === 'barbell' && (
+                    <button
+                      type="button"
+                      className={styles.plateBtn}
+                      onClick={() => {
+                        const firstSet = exerciseSets[0];
+                        openPlateCalculator(
+                          firstSet ? firstSet.weight_value : 20,
+                          firstSet ? firstSet.weight_unit : 'kg',
+                          (val) => {
+                            if (firstSet) {
+                              updateWorkoutSet(firstSet.id, { weight_value: val });
+                            }
+                          }
+                        );
+                      }}
+                      title="Calculate barbell plates per side"
+                    >
+                      <Disc size={13} />
+                      <span>Plates</span>
+                    </button>
+                  )}
+
+                  {exercise && (
+                    <button
+                      type="button"
+                      className={styles.guideBtn}
+                      onClick={() => setModalExercise(exercise)}
+                    >
+                      <BookOpen size={13} />
+                      <span>Form Guide</span>
+                    </button>
+                  )}
+                </div>
               </div>
 
               {/* Table Column Headers */}
@@ -309,6 +362,7 @@ export const ActiveWorkout: React.FC<ActiveWorkoutProps> = ({
                     onUpdate={(id, updates) => updateWorkoutSet(id, updates)}
                     onCompleteToggle={handleToggleComplete}
                     onOpenNumpad={openNumpad}
+                    onOpenPlateCalculator={openPlateCalculator}
                   />
                 ))}
               </div>
@@ -428,6 +482,18 @@ export const ActiveWorkout: React.FC<ActiveWorkoutProps> = ({
         unit={numpadConfig.unit}
         onConfirm={numpadConfig.callback}
         onClose={() => setNumpadConfig((prev) => ({ ...prev, isOpen: false }))}
+        onOpenPlateCalculator={(val) => {
+          openPlateCalculator(val, numpadConfig.unit || 'kg', numpadConfig.callback);
+        }}
+      />
+
+      {/* Visual Barbell Plate Calculator Modal */}
+      <PlateCalculatorModal
+        isOpen={plateCalcConfig.isOpen}
+        initialWeight={plateCalcConfig.initialWeight}
+        unit={plateCalcConfig.unit}
+        onClose={() => setPlateCalcConfig((prev) => ({ ...prev, isOpen: false }))}
+        onApplyWeight={plateCalcConfig.callback}
       />
 
       {/* Scientific Form Guide Modal */}

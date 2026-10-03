@@ -17,6 +17,11 @@ interface SetRowProps {
     unit: string,
     callback: (val: number) => void
   ) => void;
+  onOpenPlateCalculator?: (
+    initialWeight: number,
+    unit: any,
+    callback: (val: number) => void
+  ) => void;
 }
 
 export const SetRow: React.FC<SetRowProps> = ({
@@ -25,6 +30,7 @@ export const SetRow: React.FC<SetRowProps> = ({
   onUpdate,
   onCompleteToggle,
   onOpenNumpad,
+  onOpenPlateCalculator,
 }) => {
   const cycleSetType = () => {
     const sequence: SetType[] = ['working', 'warmup', 'drop', 'myorep'];
