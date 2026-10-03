@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from 'next';
+import { ServiceWorkerRegister } from '../components/ServiceWorkerRegister';
 import '../styles/tokens.css';
 import '../styles/globals.css';
 
@@ -44,6 +45,7 @@ export default function RootLayout({
       </head>
       <body>
         <main className="app-viewport">
+          <ServiceWorkerRegister />
           {children}
         </main>
       </body>
