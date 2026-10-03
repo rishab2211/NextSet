@@ -16,7 +16,7 @@ import {
   setUnitPreference,
 } from '../lib/auth/authStore';
 import { syncCoordinator } from '../lib/sync/syncCoordinator';
-import type { AuthUser, UserStats } from '@kinetic/shared';
+import type { AuthUser, UserStats } from '@nextset/shared';
 import {
   X,
   Shield,
@@ -389,7 +389,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
               <div className={styles.profileHeader}>
                 <div className={styles.avatarCircle}>{getInitials()}</div>
                 <div className={styles.profileInfo}>
-                  <div className={styles.profileName}>{currentUser.name || 'Kinetic Lifter'}</div>
+                  <div className={styles.profileName}>{currentUser.name || 'NextSet Lifter'}</div>
                   <div className={styles.profileEmail}>{currentUser.email}</div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 4 }}>
                     <span className="badge badge-cyan" style={{ fontSize: '10px', padding: '2px 6px' }}>

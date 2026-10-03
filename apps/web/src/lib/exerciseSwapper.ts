@@ -1,5 +1,5 @@
 import { EXERCISES, getExerciseById } from '../data/exercises';
-import type { ExerciseGuide, ExerciseCategory } from '@kinetic/shared';
+import type { ExerciseGuide, ExerciseCategory } from '@nextset/shared';
 
 export interface ExerciseAlternative {
   exercise: ExerciseGuide;

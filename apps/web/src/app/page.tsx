@@ -13,7 +13,7 @@ import { SettingsPage } from '../components/SettingsPage';
 import { Navigation, type NavTab } from '../components/Navigation';
 import { getExerciseById } from '../data/exercises';
 
-export default function KineticApp() {
+export default function NextSetApp() {
   const [currentTab, setCurrentTab] = useState<NavTab>('workout');
   const [inActiveWorkoutView, setInActiveWorkoutView] = useState<boolean>(false);
 

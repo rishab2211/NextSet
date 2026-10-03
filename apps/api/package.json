@@ -1,5 +1,5 @@
 {
-  "name": "@kinetic/api",
+  "name": "@nextset/api",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -7,11 +7,11 @@
     "deploy": "wrangler deploy",
     "deploy:prod": "wrangler deploy --env production",
     "typecheck": "tsc --noEmit",
-    "d1:init": "wrangler d1 execute kinetic-db --local --file=./schema.sql",
-    "d1:init:prod": "wrangler d1 execute kinetic-db --remote --file=./schema.sql"
+    "d1:init": "wrangler d1 execute nextset-db --local --file=./schema.sql",
+    "d1:init:prod": "wrangler d1 execute nextset-db --remote --file=./schema.sql"
   },
   "dependencies": {
-    "@kinetic/shared": "*",
+    "@nextset/shared": "*",
     "hono": "^4.3.11"
   },
   "devDependencies": {

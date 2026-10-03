@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import type { WeightUnit } from '@kinetic/shared';
+import type { WeightUnit } from '@nextset/shared';
 import { calculatePlates } from '../lib/plateMath';
 import { Disc, X, Check } from 'lucide-react';
 import styles from './PlateCalculatorModal.module.css';

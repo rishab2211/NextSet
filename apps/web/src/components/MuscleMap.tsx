@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo } from 'react';
 import dynamic from 'next/dynamic';
-import type { MuscleGroup } from '@kinetic/shared';
+import type { MuscleGroup } from '@nextset/shared';
 import type { IExerciseData, IMuscleStats, Muscle } from 'react-body-highlighter';
 import styles from './MuscleMap.module.css';
 

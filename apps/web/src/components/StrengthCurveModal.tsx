@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import type { WeightUnit } from '@kinetic/shared';
+import type { WeightUnit } from '@nextset/shared';
 import { getStrengthCurves } from '../lib/strengthMath';
 import { Trophy, X, Zap } from 'lucide-react';
 import styles from './StrengthCurveModal.module.css';

@@ -24,7 +24,7 @@ import {
 import { syncCoordinator } from '../lib/sync/syncCoordinator';
 import { db } from '../lib/db';
 import { AuthModal } from './AuthModal';
-import type { AuthUser } from '@kinetic/shared';
+import type { AuthUser } from '@nextset/shared';
 import {
   Palette,
   Scale,
@@ -183,7 +183,7 @@ export const SettingsPage: React.FC = () => {
       const sets = await db.workoutSets.toArray();
 
       const exportPayload = {
-        app: 'Kinetic',
+        app: 'NextSet',
         exportedAt: new Date().toISOString(),
         version: '1.0.0',
         deviceId: getOrCreateAnonymousUserId(),
@@ -201,7 +201,7 @@ export const SettingsPage: React.FC = () => {
       const link = document.createElement('a');
       const dateStr = new Date().toISOString().split('T')[0];
       link.href = url;
-      link.download = `kinetic-workout-backup-${dateStr}.json`;
+      link.download = `nextset-workout-backup-${dateStr}.json`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -446,7 +446,7 @@ export const SettingsPage: React.FC = () => {
         <div className={styles.accountCard}>
           <div>
             <div className={styles.accountName}>
-              {currentUser ? currentUser.name || 'Kinetic Lifter' : 'Anonymous Device Partition'}
+              {currentUser ? currentUser.name || 'NextSet Lifter' : 'Anonymous Device Partition'}
             </div>
             <div className={styles.accountEmail}>
               {currentUser ? currentUser.email : deviceId}
@@ -507,7 +507,7 @@ export const SettingsPage: React.FC = () => {
 
       {/* App Info Footer */}
       <div style={{ textAlign: 'center', fontSize: '11px', color: 'var(--text-disabled)', marginTop: 'var(--space-2)' }}>
-        Kinetic Gym PWA · Version 1.0.0 · Offline Ready
+        NextSet Gym PWA · Version 1.0.0 · Offline Ready
       </div>
 
       {/* Auth Modal */}

@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://kinetic.app/sitemap.xml
+Sitemap: https://nextset.pages.dev/sitemap.xml

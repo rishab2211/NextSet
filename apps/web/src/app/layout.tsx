@@ -4,8 +4,8 @@ import '../styles/tokens.css';
 import '../styles/globals.css';
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'https://kinetic.app'),
-  title: 'Kinetic — High Performance Strength & Hypertrophy PWA',
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'https://nextset.pages.dev'),
+  title: 'NextSet — High Performance Strength & Hypertrophy PWA',
   description: 'Mobile-first, offline-first gym tracking designed for high-stress gym environments with real-time anatomy cues and instant numeric logging.',
   manifest: '/manifest.json',
   icons: {
@@ -19,16 +19,16 @@ export const metadata: Metadata = {
     ],
   },
   openGraph: {
-    title: 'Kinetic — High Performance Strength & Hypertrophy PWA',
+    title: 'NextSet — High Performance Strength & Hypertrophy PWA',
     description: 'Mobile-first, offline-first gym tracking designed for high-stress gym environments with real-time anatomy cues and instant numeric logging.',
     url: '/',
-    siteName: 'Kinetic',
+    siteName: 'NextSet',
     images: [
       {
         url: '/icons/icon-512.png',
         width: 512,
         height: 512,
-        alt: 'Kinetic Icon',
+        alt: 'NextSet Icon',
       },
     ],
     locale: 'en_US',
@@ -36,14 +36,14 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary',
-    title: 'Kinetic — High Performance Strength & Hypertrophy PWA',
+    title: 'NextSet — High Performance Strength & Hypertrophy PWA',
     description: 'Mobile-first, offline-first gym tracking designed for high-stress gym environments.',
     images: ['/icons/icon-512.png'],
   },
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
-    title: 'Kinetic',
+    title: 'NextSet',
   },
   formatDetection: {
     telephone: false,

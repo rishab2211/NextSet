@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import type { ExerciseGuide } from '@kinetic/shared';
+import type { ExerciseGuide } from '@nextset/shared';
 import { MuscleMap } from './MuscleMap';
 import { X, AlertTriangle, Check, Dumbbell, ChevronDown, ChevronUp } from 'lucide-react';
 import styles from './ExerciseModal.module.css';

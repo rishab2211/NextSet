@@ -1,4 +1,4 @@
--- Kinetic Gym D1 Relational Schema
+-- NextSet Gym D1 Relational Schema
 -- Supports idempotent Last-Write-Wins UPSERT synchronization
 
 CREATE TABLE IF NOT EXISTS users (

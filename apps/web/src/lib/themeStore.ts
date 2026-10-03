@@ -61,13 +61,26 @@ export interface WorkoutPreferences {
   hapticFeedback: boolean;
 }
 
-const STORAGE_KEY_SURFACE = 'kinetic_theme_surface';
-const STORAGE_KEY_ACCENT = 'kinetic_theme_accent';
-const STORAGE_KEY_WORKOUT_PREFS = 'kinetic_workout_preferences';
+const STORAGE_KEY_SURFACE = 'nextset_theme_surface';
+const STORAGE_KEY_ACCENT = 'nextset_theme_accent';
+const STORAGE_KEY_WORKOUT_PREFS = 'nextset_workout_preferences';
+
+function getStoredPref(primaryKey: string, legacyKey?: string): string | null {
+  if (typeof window === 'undefined') return null;
+  const val = localStorage.getItem(primaryKey);
+  if (val) return val;
+  if (legacyKey) {
+    const legacyVal = localStorage.getItem(legacyKey);
+    if (legacyVal) {
+      localStorage.setItem(primaryKey, legacyVal);
+      return legacyVal;
+    }
+  }
+  return null;
+}
 
 export function getSurfaceTheme(): SurfaceTheme {
-  if (typeof window === 'undefined') return 'midnight';
-  const val = localStorage.getItem(STORAGE_KEY_SURFACE);
+  const val = getStoredPref(STORAGE_KEY_SURFACE, 'kinetic_theme_surface');
   if (val === 'oled' || val === 'slate' || val === 'midnight') return val;
   return 'midnight';
 }
@@ -76,12 +89,12 @@ export function setSurfaceTheme(theme: SurfaceTheme): void {
   if (typeof window === 'undefined') return;
   localStorage.setItem(STORAGE_KEY_SURFACE, theme);
   applyThemeToDOM();
+  window.dispatchEvent(new Event('nextset_theme_change'));
   window.dispatchEvent(new Event('kinetic_theme_change'));
 }
 
 export function getAccentColor(): AccentColor {
-  if (typeof window === 'undefined') return 'crimson';
-  const val = localStorage.getItem(STORAGE_KEY_ACCENT);
+  const val = getStoredPref(STORAGE_KEY_ACCENT, 'kinetic_theme_accent');
   if (ACCENT_PRESETS.some((p) => p.id === val)) return val as AccentColor;
   return 'crimson';
 }
@@ -90,6 +103,7 @@ export function setAccentColor(accent: AccentColor): void {
   if (typeof window === 'undefined') return;
   localStorage.setItem(STORAGE_KEY_ACCENT, accent);
   applyThemeToDOM();
+  window.dispatchEvent(new Event('nextset_theme_change'));
   window.dispatchEvent(new Event('kinetic_theme_change'));
 }
 
@@ -97,7 +111,7 @@ export function getWorkoutPreferences(): WorkoutPreferences {
   if (typeof window === 'undefined') {
     return { defaultRestSeconds: 90, timerSound: true, timerAutoStart: true, hapticFeedback: true };
   }
-  const raw = localStorage.getItem(STORAGE_KEY_WORKOUT_PREFS);
+  const raw = getStoredPref(STORAGE_KEY_WORKOUT_PREFS, 'kinetic_workout_preferences');
   if (!raw) {
     return { defaultRestSeconds: 90, timerSound: true, timerAutoStart: true, hapticFeedback: true };
   }
@@ -111,6 +125,7 @@ export function getWorkoutPreferences(): WorkoutPreferences {
 export function saveWorkoutPreferences(prefs: WorkoutPreferences): void {
   if (typeof window === 'undefined') return;
   localStorage.setItem(STORAGE_KEY_WORKOUT_PREFS, JSON.stringify(prefs));
+  window.dispatchEvent(new Event('nextset_workout_prefs_change'));
   window.dispatchEvent(new Event('kinetic_workout_prefs_change'));
 }
 

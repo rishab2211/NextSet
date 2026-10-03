@@ -2,7 +2,7 @@ import assert from 'node:assert';
 import test from 'node:test';
 import { calculatePlates } from './plateMath.ts';
 import { calculate1RM, getStrengthCurves, checkPersonalRecord } from './strengthMath.ts';
-import type { WorkoutSet } from '@kinetic/shared';
+import type { WorkoutSet } from '@nextset/shared';
 
 test('plateMath: calculatePlates handles metric 100kg with 20kg bar', () => {
   const result = calculatePlates(100, 20, 'kg');

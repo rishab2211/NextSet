@@ -12,7 +12,7 @@ import {
   swapExerciseInSession,
 } from '../lib/db/workoutStore';
 import { EXERCISES, getExerciseById } from '../data/exercises';
-import type { WorkoutSession, WorkoutSet, ExerciseGuide } from '@kinetic/shared';
+import type { WorkoutSession, WorkoutSet, ExerciseGuide } from '@nextset/shared';
 import { SetRow } from './SetRow';
 import { Numpad, type NumpadMode } from './Numpad';
 import { RestTimer } from './RestTimer';

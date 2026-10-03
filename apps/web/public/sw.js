@@ -1,4 +1,4 @@
-const CACHE_NAME = 'kinetic-pwa-v2';
+const CACHE_NAME = 'nextset-pwa-v1';
 
 const STATIC_ASSETS = [
   '/',

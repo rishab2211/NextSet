@@ -1,4 +1,4 @@
-import type { WeightUnit } from '@kinetic/shared';
+import type { WeightUnit } from '@nextset/shared';
 
 export interface PlateSpec {
   weight: number;

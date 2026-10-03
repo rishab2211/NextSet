@@ -1,4 +1,4 @@
-import type { ExerciseGuide } from '@kinetic/shared';
+import type { ExerciseGuide } from '@nextset/shared';
 
 export const EXERCISES: ExerciseGuide[] = [
   // ==========================================

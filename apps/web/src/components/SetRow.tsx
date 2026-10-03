@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import type { WorkoutSet, SetType } from '@kinetic/shared';
+import type { WorkoutSet, SetType } from '@nextset/shared';
 import type { NumpadMode } from './Numpad';
 import { Check, Copy } from 'lucide-react';
 import styles from './SetRow.module.css';

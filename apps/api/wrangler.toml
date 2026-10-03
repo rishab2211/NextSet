@@ -1,4 +1,4 @@
-name = "kinetic-api"
+name = "nextset-api"
 main = "src/index.ts"
 compatibility_date = "2024-05-12"
 compatibility_flags = ["nodejs_compat"]
@@ -6,22 +6,22 @@ compatibility_flags = ["nodejs_compat"]
 # Local development default
 [[d1_databases]]
 binding = "DB"
-database_name = "kinetic-db"
-database_id = "local-kinetic-d1-id"
+database_name = "nextset-db"
+database_id = "local-nextset-d1-id"
 migrations_dir = "migrations"
 
 [vars]
 ENVIRONMENT = "development"
 
 # Production environment target
-# Deploy via: `npm run deploy:api` or `wrangler deploy --env production`
+# Deploy via: `npm run deploy:api:prod` or `wrangler deploy --env production`
 [env.production]
-name = "kinetic-api-production"
+name = "nextset-api-production"
 vars = { ENVIRONMENT = "production" }
 
 [[env.production.d1_databases]]
 binding = "DB"
-database_name = "kinetic-db"
-# Replace with the database_id printed by: wrangler d1 create kinetic-db
+database_name = "nextset-db"
+# Replace with the database_id printed by: wrangler d1 create nextset-db
 database_id = "REPLACE_WITH_PRODUCTION_D1_DATABASE_ID"
 migrations_dir = "migrations"

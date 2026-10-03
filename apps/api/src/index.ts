@@ -15,7 +15,7 @@ import type {
   UserStats,
   AuthTokenResponse,
   AuthUser,
-} from '@kinetic/shared';
+} from '@nextset/shared';
 import { signJwt, verifyJwt, generateOtp, hashPassword, verifyPassword, generateSalt } from './auth';
 
 type Bindings = {
@@ -26,7 +26,7 @@ type Bindings = {
 
 const app = new Hono<{ Bindings: Bindings }>();
 
-const DEFAULT_SECRET = 'kinetic_dev_super_secret_jwt_hmac_key_2026';
+const DEFAULT_SECRET = 'nextset_dev_super_secret_jwt_hmac_key_2026';
 
 // Enable CORS for PWA client domain
 app.use('*', cors({
@@ -39,7 +39,7 @@ app.use('*', cors({
 app.get('/api/health', (c) => {
   return c.json({
     status: 'ok',
-    app: 'kinetic-api',
+    app: 'nextset-api',
     time: new Date().toISOString(),
     env: c.env.ENVIRONMENT || 'development',
   });
@@ -600,7 +600,7 @@ app.post('/api/sync', async (c) => {
     // 1. TOPOLOGICAL STEP 1: UPSERT Sessions first
     for (const session of sessions) {
       // Attribute session to the resolved user ID (authenticated or anonymous partition)
-      const effectiveUserId = session.user_id && session.user_id !== 'user_kinetic_local'
+      const effectiveUserId = session.user_id && session.user_id !== 'user_kinetic_local' && session.user_id !== 'user_nextset_local'
         ? session.user_id
         : userId;
 

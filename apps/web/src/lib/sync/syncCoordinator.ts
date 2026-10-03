@@ -1,6 +1,6 @@
 import { db } from '../db';
 import { getAuthToken, getOrCreateAnonymousUserId, getEffectiveUserId } from '../auth/authStore';
-import type { SyncPayload, SyncResult, SyncPullResponse, WorkoutSession, WorkoutSet } from '@kinetic/shared';
+import type { SyncPayload, SyncResult, SyncPullResponse, WorkoutSession, WorkoutSet } from '@nextset/shared';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8787';
 
@@ -14,10 +14,13 @@ class SyncCoordinator {
         this.sync();
       });
 
-      window.addEventListener('kinetic_auth_change', () => {
+      const handleAuthChange = () => {
         console.log('[SyncCoordinator] Auth state changed, triggering full sync & pull.');
         this.sync().then(() => this.pull());
-      });
+      };
+
+      window.addEventListener('nextset_auth_change', handleAuthChange);
+      window.addEventListener('kinetic_auth_change', handleAuthChange);
     }
   }
 

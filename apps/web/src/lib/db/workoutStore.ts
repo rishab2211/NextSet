@@ -1,6 +1,6 @@
 import { db } from './index';
 import { getEffectiveUserId, getUnitPreference } from '../auth/authStore';
-import type { WorkoutSession, WorkoutSet, SetType, WeightUnit } from '@kinetic/shared';
+import type { WorkoutSession, WorkoutSet, SetType, WeightUnit } from '@nextset/shared';
 
 // Safe UUID generation fallback for environments without crypto.randomUUID
 function generateId(): string {

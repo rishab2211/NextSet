@@ -1,5 +1,5 @@
 {
-  "name": "@kinetic/web",
+  "name": "@nextset/web",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -9,7 +9,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@kinetic/shared": "*",
+    "@nextset/shared": "*",
     "dexie": "^4.0.7",
     "dexie-react-hooks": "^1.1.7",
     "lucide-react": "^0.378.0",

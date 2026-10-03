@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import type { WorkoutSession, AuthUser } from '@kinetic/shared';
+import type { WorkoutSession, AuthUser } from '@nextset/shared';
 import { AuthModal } from './AuthModal';
 import { getCurrentUser } from '../lib/auth/authStore';
 import {
@@ -75,7 +75,7 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
           <div className={styles.logoIcon}>
             <Dumbbell size={18} color="var(--accent-primary)" />
           </div>
-          <div className={styles.logoText}>KINETIC</div>
+          <div className={styles.logoText}>NEXTSET</div>
         </div>
 
         <div className={styles.statusArea}>

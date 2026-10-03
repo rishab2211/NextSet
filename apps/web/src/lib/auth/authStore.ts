@@ -8,17 +8,31 @@ import type {
   UpdateProfileRequest,
   ChangePasswordRequest,
   UserStats,
-} from '@kinetic/shared';
+} from '@nextset/shared';
 import { db } from '../db';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8787';
 
-const STORAGE_KEY_TOKEN = 'kinetic_auth_jwt';
-const STORAGE_KEY_USER = 'kinetic_auth_user';
-const STORAGE_KEY_ANON_ID = 'kinetic_device_anon_id';
-const STORAGE_KEY_LOCAL_VAULT = 'kinetic_local_accounts_vault';
-const STORAGE_KEY_UNIT_PREF = 'kinetic_unit_preference';
-const STORAGE_KEY_BAR_WEIGHT = 'kinetic_barbell_weight';
+const STORAGE_KEY_TOKEN = 'nextset_auth_jwt';
+const STORAGE_KEY_USER = 'nextset_auth_user';
+const STORAGE_KEY_ANON_ID = 'nextset_device_anon_id';
+const STORAGE_KEY_LOCAL_VAULT = 'nextset_local_accounts_vault';
+const STORAGE_KEY_UNIT_PREF = 'nextset_unit_preference';
+const STORAGE_KEY_BAR_WEIGHT = 'nextset_barbell_weight';
+
+function getStoredValue(primaryKey: string, legacyKey?: string): string | null {
+  if (typeof window === 'undefined') return null;
+  const val = localStorage.getItem(primaryKey);
+  if (val) return val;
+  if (legacyKey) {
+    const legacyVal = localStorage.getItem(legacyKey);
+    if (legacyVal) {
+      localStorage.setItem(primaryKey, legacyVal);
+      return legacyVal;
+    }
+  }
+  return null;
+}
 
 /**
  * Returns or initializes a unique anonymous device UUID partition
@@ -26,7 +40,7 @@ const STORAGE_KEY_BAR_WEIGHT = 'kinetic_barbell_weight';
 export function getOrCreateAnonymousUserId(): string {
   if (typeof window === 'undefined') return 'anon_server_render';
 
-  let anonId = localStorage.getItem(STORAGE_KEY_ANON_ID);
+  let anonId = getStoredValue(STORAGE_KEY_ANON_ID, 'kinetic_device_anon_id');
   if (!anonId) {
     const randomSuffix = typeof crypto !== 'undefined' && crypto.randomUUID
       ? crypto.randomUUID().replace(/-/g, '').substring(0, 16)
@@ -47,13 +61,11 @@ export function getEffectiveUserId(): string {
 }
 
 export function getAuthToken(): string | null {
-  if (typeof window === 'undefined') return null;
-  return localStorage.getItem(STORAGE_KEY_TOKEN);
+  return getStoredValue(STORAGE_KEY_TOKEN, 'kinetic_auth_jwt');
 }
 
 export function getCurrentUser(): AuthUser | null {
-  if (typeof window === 'undefined') return null;
-  const userStr = localStorage.getItem(STORAGE_KEY_USER);
+  const userStr = getStoredValue(STORAGE_KEY_USER, 'kinetic_auth_user');
   if (!userStr) return null;
   try {
     return JSON.parse(userStr);
@@ -72,6 +84,7 @@ export function saveAuthSession(token: string, user: AuthUser): void {
   if (user.barbell_weight) {
     localStorage.setItem(STORAGE_KEY_BAR_WEIGHT, user.barbell_weight.toString());
   }
+  window.dispatchEvent(new Event('nextset_auth_change'));
   window.dispatchEvent(new Event('kinetic_auth_change'));
 }
 
@@ -79,6 +92,9 @@ export function clearAuthSession(): void {
   if (typeof window === 'undefined') return;
   localStorage.removeItem(STORAGE_KEY_TOKEN);
   localStorage.removeItem(STORAGE_KEY_USER);
+  localStorage.removeItem('kinetic_auth_jwt');
+  localStorage.removeItem('kinetic_auth_user');
+  window.dispatchEvent(new Event('nextset_auth_change'));
   window.dispatchEvent(new Event('kinetic_auth_change'));
 }
 
@@ -86,7 +102,7 @@ export function getUnitPreference(): 'kg' | 'lbs' {
   if (typeof window === 'undefined') return 'kg';
   const user = getCurrentUser();
   if (user && user.unit_preference) return user.unit_preference;
-  const stored = localStorage.getItem(STORAGE_KEY_UNIT_PREF);
+  const stored = getStoredValue(STORAGE_KEY_UNIT_PREF, 'kinetic_unit_preference');
   return stored === 'lbs' ? 'lbs' : 'kg';
 }
 
@@ -98,6 +114,7 @@ export function setUnitPreference(unit: 'kg' | 'lbs'): void {
     user.unit_preference = unit;
     localStorage.setItem(STORAGE_KEY_USER, JSON.stringify(user));
   }
+  window.dispatchEvent(new Event('nextset_units_change'));
   window.dispatchEvent(new Event('kinetic_units_change'));
 }
 

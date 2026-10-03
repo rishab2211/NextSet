@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { EXERCISES } from '../data/exercises';
-import type { ExerciseGuide, MuscleGroup } from '@kinetic/shared';
+import type { ExerciseGuide, MuscleGroup } from '@nextset/shared';
 import { MuscleMap } from './MuscleMap';
 import { ExerciseModal } from './ExerciseModal';
 import { Search, ChevronRight } from 'lucide-react';

@@ -1,4 +1,4 @@
-import type { WorkoutSet, WeightUnit } from '@kinetic/shared';
+import type { WorkoutSet, WeightUnit } from '@nextset/shared';
 
 export interface OneRepMaxBreakdown {
   estimated1RM: number;

@@ -3,7 +3,7 @@
 import React from 'react';
 import { getExerciseById } from '../data/exercises';
 import { getSmartAlternatives } from '../lib/exerciseSwapper';
-import type { ExerciseGuide } from '@kinetic/shared';
+import type { ExerciseGuide } from '@nextset/shared';
 import { ArrowLeftRight, X, BookOpen, Check } from 'lucide-react';
 import styles from './ExerciseSwapModal.module.css';
 
