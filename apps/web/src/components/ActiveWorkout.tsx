@@ -20,7 +20,9 @@ import { RestTimer } from './RestTimer';
 import { ExerciseModal } from './ExerciseModal';
 import { PlateCalculatorModal } from './PlateCalculatorModal';
 import { StrengthCurveModal } from './StrengthCurveModal';
+import { ExerciseSwapModal } from './ExerciseSwapModal';
 import { checkPersonalRecord } from '../lib/strengthMath';
+import { swapExerciseInSession } from '../lib/db/workoutStore';
 import {
   CheckCircle,
   Plus,
@@ -32,6 +34,7 @@ import {
   Dumbbell,
   Disc,
   Trophy,
+  ArrowLeftRight,
 } from 'lucide-react';
 import styles from './ActiveWorkout.module.css';
 
@@ -171,7 +174,10 @@ export const ActiveWorkout: React.FC<ActiveWorkoutProps> = ({
     unit: 'kg',
   });
 
-  // 6. Exercise Picker Drawer State
+  // 8. Exercise Alternative Swapper Modal State
+  const [swapModalExerciseId, setSwapModalExerciseId] = useState<string | null>(null);
+
+  // 9. Exercise Picker Drawer State
   const [isPickerOpen, setIsPickerOpen] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedMuscleFilter, setSelectedMuscleFilter] = useState<string>('all');
@@ -336,6 +342,17 @@ export const ActiveWorkout: React.FC<ActiveWorkoutProps> = ({
                 </div>
 
                 <div style={{ display: 'flex', gap: '6px' }}>
+                  {/* Equipment Busy Exercise Swapper */}
+                  <button
+                    type="button"
+                    className={styles.headerSwapBtn}
+                    onClick={() => setSwapModalExerciseId(exId)}
+                    title="Swap exercise if equipment is occupied"
+                  >
+                    <ArrowLeftRight size={13} />
+                    <span>Swap</span>
+                  </button>
+
                   {/* 1RM Strength Curve Button */}
                   <button
                     type="button"
@@ -573,6 +590,19 @@ export const ActiveWorkout: React.FC<ActiveWorkoutProps> = ({
         unit={strengthModalConfig.unit}
         onClose={() => setStrengthModalConfig((prev) => ({ ...prev, isOpen: false }))}
         onApplyWeight={strengthModalConfig.callback}
+      />
+
+      {/* Equipment Busy Alternative Swapper Modal */}
+      <ExerciseSwapModal
+        isOpen={Boolean(swapModalExerciseId)}
+        currentExerciseId={swapModalExerciseId}
+        onClose={() => setSwapModalExerciseId(null)}
+        onConfirmSwap={async (newExercise) => {
+          if (!swapModalExerciseId) return;
+          await swapExerciseInSession(session.id, swapModalExerciseId, newExercise.id);
+          setSwapModalExerciseId(null);
+        }}
+        onViewGuide={(ex) => setModalExercise(ex)}
       />
     </div>
   );

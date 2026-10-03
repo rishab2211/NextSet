@@ -209,3 +209,34 @@ export async function getPreviousExerciseSets(
   const latestSessionId = allSets[0].session_id;
   return allSets.filter(s => s.session_id === latestSessionId).sort((a, b) => a.set_number - b.set_number);
 }
+
+/**
+ * Swaps an exercise within an active session, re-pointing all sets to the new exercise
+ */
+export async function swapExerciseInSession(
+  sessionId: string,
+  oldExerciseId: string,
+  newExerciseId: string
+): Promise<void> {
+  const now = new Date().toISOString();
+  await db.transaction('rw', db.workoutSets, db.syncQueue, async () => {
+    const sessionSets = await db.workoutSets
+      .where('session_id')
+      .equals(sessionId)
+      .filter((s) => s.exercise_id === oldExerciseId && !s.deleted)
+      .toArray();
+
+    for (const set of sessionSets) {
+      await db.workoutSets.update(set.id, {
+        exercise_id: newExerciseId,
+        updated_at: now,
+      });
+      await db.syncQueue.add({
+        entity_type: 'set',
+        entity_id: set.id,
+        action: 'update',
+        timestamp: now,
+      });
+    }
+  });
+}
