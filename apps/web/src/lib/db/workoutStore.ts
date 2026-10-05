@@ -12,32 +12,49 @@ function generateId(): string {
 
 /**
  * Starts a new active workout session in Dexie.
- * Auto-resolves any zombie workouts older than 12 hours.
+ * Auto-resolves any existing active sessions so only one active session exists.
  */
 export async function startWorkoutSession(title: string = 'Gym Workout'): Promise<WorkoutSession> {
   const now = new Date().toISOString();
 
-  return await db.transaction('rw', db.workoutSessions, db.syncQueue, async () => {
-    // 1. Resolve stale active sessions (>12 hours old)
-    const twelveHoursAgo = new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString();
-    const staleSessions = await db.workoutSessions
+  return await db.transaction('rw', db.workoutSessions, db.workoutSets, db.syncQueue, async () => {
+    // 1. Resolve any existing active sessions so only 1 session is ever active
+    const activeSessions = await db.workoutSessions
       .where('status')
       .equals('active')
-      .filter(s => s.started_at < twelveHoursAgo)
       .toArray();
 
-    for (const stale of staleSessions) {
+    for (const stale of activeSessions) {
       await db.workoutSessions.update(stale.id, {
         status: 'abandoned',
         ended_at: now,
         updated_at: now,
+        deleted: true,
       });
       await db.syncQueue.add({
         entity_type: 'session',
         entity_id: stale.id,
-        action: 'update',
+        action: 'delete',
         timestamp: now,
       });
+
+      const staleSets = await db.workoutSets
+        .where('session_id')
+        .equals(stale.id)
+        .toArray();
+
+      for (const s of staleSets) {
+        await db.workoutSets.update(s.id, {
+          deleted: true,
+          updated_at: now,
+        });
+        await db.syncQueue.add({
+          entity_type: 'set',
+          entity_id: s.id,
+          action: 'delete',
+          timestamp: now,
+        });
+      }
     }
 
     // 2. Create new session with user partition
@@ -85,23 +102,98 @@ export async function finishWorkoutSession(sessionId: string): Promise<void> {
 }
 
 /**
- * Abandon / cancel active workout session
+ * Abandon / discard active workout session.
+ * Soft deletes the session and all associated workout sets,
+ * and clears any other orphaned active sessions so no active ghost workouts linger.
  */
 export async function abandonWorkoutSession(sessionId: string): Promise<void> {
   const now = new Date().toISOString();
-  await db.transaction('rw', db.workoutSessions, db.syncQueue, async () => {
+  await db.transaction('rw', db.workoutSessions, db.workoutSets, db.syncQueue, async () => {
+    // 1. Mark target session as abandoned and deleted
     await db.workoutSessions.update(sessionId, {
       status: 'abandoned',
       ended_at: now,
       updated_at: now,
+      deleted: true,
     });
     await db.syncQueue.add({
       entity_type: 'session',
       entity_id: sessionId,
-      action: 'update',
+      action: 'delete',
       timestamp: now,
     });
+
+    // 2. Mark all sets belonging to this session as deleted
+    const sessionSets = await db.workoutSets
+      .where('session_id')
+      .equals(sessionId)
+      .toArray();
+
+    for (const set of sessionSets) {
+      await db.workoutSets.update(set.id, {
+        deleted: true,
+        updated_at: now,
+      });
+      await db.syncQueue.add({
+        entity_type: 'set',
+        entity_id: set.id,
+        action: 'delete',
+        timestamp: now,
+      });
+    }
+
+    // 3. Clean up any other orphaned active sessions in Dexie to prevent ghost active workouts
+    const otherActiveSessions = await db.workoutSessions
+      .where('status')
+      .equals('active')
+      .toArray();
+
+    for (const other of otherActiveSessions) {
+      if (other.id !== sessionId) {
+        await db.workoutSessions.update(other.id, {
+          status: 'abandoned',
+          ended_at: now,
+          updated_at: now,
+          deleted: true,
+        });
+        await db.syncQueue.add({
+          entity_type: 'session',
+          entity_id: other.id,
+          action: 'delete',
+          timestamp: now,
+        });
+
+        const otherSets = await db.workoutSets
+          .where('session_id')
+          .equals(other.id)
+          .toArray();
+
+        for (const oSet of otherSets) {
+          await db.workoutSets.update(oSet.id, {
+            deleted: true,
+            updated_at: now,
+          });
+          await db.syncQueue.add({
+            entity_type: 'set',
+            entity_id: oSet.id,
+            action: 'delete',
+            timestamp: now,
+          });
+        }
+      }
+    }
   });
+
+  // 4. Asynchronously push to cloud if online
+  if (typeof window !== 'undefined' && typeof navigator !== 'undefined' && navigator.onLine) {
+    import('../sync/syncCoordinator')
+      .then(({ syncCoordinator }) => {
+        syncCoordinator.sync().catch((err) => {
+          console.warn('[workoutStore] Sync on discard failed:', err);
+        });
+      })
+      .catch(() => {});
+  }
 }
 
 /**
