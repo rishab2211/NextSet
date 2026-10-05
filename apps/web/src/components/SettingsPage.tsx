@@ -26,24 +26,24 @@ import { db } from '../lib/db';
 import { AuthModal } from './AuthModal';
 import type { AuthUser } from '@nextset/shared';
 import {
+  Sliders,
   Palette,
-  Scale,
-  Timer,
   Shield,
   Download,
   Check,
-  Smartphone,
   RefreshCw,
-  Sliders,
-  Volume2,
-  Sparkles,
-  Zap,
+  User,
+  HardDrive,
 } from 'lucide-react';
+import {
+  DumbbellHorizontalIcon,
+  RestClockIcon,
+} from './HomeIcons';
 import styles from './SettingsPage.module.css';
 
 export const SettingsPage: React.FC = () => {
-  const [surface, setSurface] = useState<SurfaceTheme>('midnight');
-  const [accent, setAccent] = useState<AccentColor>('crimson');
+  const [surface, setSurface] = useState<SurfaceTheme>('pastel-dark');
+  const [accent, setAccent] = useState<AccentColor>('lavender');
   const [unitPref, setUnitPref] = useState<'kg' | 'lbs'>('kg');
   const [barbellWt, setBarbellWt] = useState<number>(20);
   const [workoutPrefs, setWorkoutPrefs] = useState<WorkoutPreferences>({
@@ -168,7 +168,7 @@ export const SettingsPage: React.FC = () => {
     try {
       await syncCoordinator.sync();
       await syncCoordinator.pull();
-      setSyncStatusMsg('Cloud sync complete!');
+      setSyncStatusMsg('Cloud sync complete');
       await loadDbStats();
     } catch {
       setSyncStatusMsg('Sync failed. Please check network connection.');
@@ -206,111 +206,108 @@ export const SettingsPage: React.FC = () => {
       link.click();
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
-    } catch (e) {
+    } catch {
       alert('Failed to export workout data');
     }
   };
 
+  const userInitial = currentUser?.name
+    ? currentUser.name.charAt(0).toUpperCase()
+    : currentUser?.email
+    ? currentUser.email.charAt(0).toUpperCase()
+    : 'U';
+
   return (
     <div className={styles.container}>
-      {/* Header */}
-      <div className={styles.topBar}>
-        <div className={styles.pageTitle}>
-          <Sliders size={22} color="var(--accent-primary)" />
-          <span>Settings</span>
+      {/* Top Header */}
+      <header className={styles.topBar}>
+        <div className={styles.headerLeft}>
+          <div className={styles.logoBadge}>
+            <Sliders size={16} color="#ffffff" strokeWidth={2.4} />
+          </div>
+          <div className={styles.titleArea}>
+            <h1 className={styles.pageTitle}>Settings</h1>
+            <span className={styles.pageSubtitle}>Gym preferences & local storage</span>
+          </div>
         </div>
-      </div>
 
-      {/* ===================== SECTION 1: APPEARANCE & THEMES ===================== */}
-      <div className={styles.section}>
+        {currentUser && (
+          <div className={styles.userBadge}>
+            <User size={12} color="var(--accent-primary, #a78bfa)" />
+            <span>{currentUser.name || currentUser.email.split('@')[0]}</span>
+          </div>
+        )}
+      </header>
+
+      {/* ===================== SECTION 1: ACCOUNT & CLOUD SYNC ===================== */}
+      <section className={styles.section} aria-label="Account and Sync">
         <div className={styles.sectionHeader}>
-          <Palette size={18} color="var(--accent-primary)" />
-          <span>Appearance & Themes</span>
+          <div className={styles.sectionHeaderIcon}>
+            <Shield size={15} />
+          </div>
+          <span>Account & Cloud Sync</span>
         </div>
         <p className={styles.sectionDesc}>
-          Customize your gym surface theme and athletic accent color.
+          Workouts are stored locally first in IndexedDB and synced automatically when signed in.
         </p>
 
-        {/* Background Surface Mode */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: 4 }}>
-          <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase' }}>
-            Surface Background
-          </span>
-          <div className={styles.segmentedControl}>
-            <button
-              type="button"
-              className={`${styles.segmentBtn} ${surface === 'midnight' ? styles.segmentBtnActive : ''}`}
-              onClick={() => handleSelectSurface('midnight')}
-            >
-              Midnight Charcoal
-            </button>
-            <button
-              type="button"
-              className={`${styles.segmentBtn} ${surface === 'oled' ? styles.segmentBtnActive : ''}`}
-              onClick={() => handleSelectSurface('oled')}
-            >
-              OLED Black
-            </button>
-            <button
-              type="button"
-              className={`${styles.segmentBtn} ${surface === 'slate' ? styles.segmentBtnActive : ''}`}
-              onClick={() => handleSelectSurface('slate')}
-            >
-              Gunmetal Slate
-            </button>
+        <div className={styles.accountCard}>
+          <div className={styles.accountDetails}>
+            <div className={styles.accountAvatar}>
+              {userInitial}
+            </div>
+            <div className={styles.accountTexts}>
+              <div className={styles.accountName}>
+                {currentUser ? (currentUser.name || 'User Account') : 'Local Guest'}
+              </div>
+              <div className={styles.accountEmail}>
+                {currentUser ? currentUser.email : `Device: ${deviceId.slice(0, 16)}...`}
+              </div>
+            </div>
           </div>
+
+          <button
+            type="button"
+            className={styles.accountActionBtn}
+            onClick={() => setIsAuthModalOpen(true)}
+          >
+            {currentUser ? 'Manage' : 'Sign in'}
+          </button>
         </div>
 
-        {/* Accent Color Palette Swatches */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: 8 }}>
-          <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase' }}>
-            Athletic Accent Color
-          </span>
-          <div className={styles.swatchesGrid}>
-            {ACCENT_PRESETS.map((preset) => {
-              const isSelected = accent === preset.id;
-              return (
-                <button
-                  key={preset.id}
-                  type="button"
-                  className={`${styles.swatchBtn} ${isSelected ? styles.swatchBtnActive : ''}`}
-                  onClick={() => handleSelectAccent(preset.id)}
-                >
-                  <div className={styles.swatchCircle} style={{ backgroundColor: preset.hex }}>
-                    {isSelected && <Check size={14} strokeWidth={3} />}
-                  </div>
-                  <span className={styles.swatchName}>{preset.name}</span>
-                </button>
-              );
-            })}
+        {syncStatusMsg && (
+          <div className={styles.syncStatusMsg}>
+            <Check size={13} strokeWidth={2.5} />
+            <span>{syncStatusMsg}</span>
           </div>
-        </div>
+        )}
 
-        {/* Live Preview */}
-        <div className={styles.previewBox}>
-          <div className={styles.previewText}>Active Theme Preview</div>
-          <div className={styles.previewBadge}>
-            <Sparkles size={12} style={{ display: 'inline', marginRight: 4 }} />
-            <span>{surface.toUpperCase()} · {accent.toUpperCase()}</span>
-          </div>
-        </div>
-      </div>
+        <button
+          type="button"
+          className={styles.syncBtn}
+          onClick={handleManualSync}
+          disabled={isSyncing}
+        >
+          <RefreshCw size={14} className={isSyncing ? styles.spin : ''} />
+          <span>{isSyncing ? 'Syncing...' : 'Sync Now'}</span>
+        </button>
+      </section>
 
       {/* ===================== SECTION 2: UNITS & EQUIPMENT ===================== */}
-      <div className={styles.section}>
+      <section className={styles.section} aria-label="Units and Equipment">
         <div className={styles.sectionHeader}>
-          <Scale size={18} color="var(--accent-primary)" />
+          <div className={styles.sectionHeaderIcon}>
+            <DumbbellHorizontalIcon size={15} strokeWidth={2.2} />
+          </div>
           <span>Units & Equipment</span>
         </div>
         <p className={styles.sectionDesc}>
-          Set your preferred weight standards for workouts and barbell calculations.
+          Standard measures for plate math and volume calculation.
         </p>
 
         {/* Weight Unit Switcher */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-          <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase' }}>
-            Primary Weight Unit
-          </span>
+        <div className={styles.settingGroup}>
+          <label className={styles.groupLabel}>Weight Unit</label>
           <div className={styles.segmentedControl}>
             <button
               type="button"
@@ -330,24 +327,22 @@ export const SettingsPage: React.FC = () => {
         </div>
 
         {/* Olympic Barbell Weight */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: 4 }}>
-          <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase' }}>
-            Standard Barbell Weight
-          </span>
-          <div className={styles.segmentedControl}>
+        <div className={styles.settingGroup}>
+          <label className={styles.groupLabel}>Standard Barbell Weight</label>
+          <div className={styles.segmentedControl3}>
             <button
               type="button"
               className={`${styles.segmentBtn} ${barbellWt === 20 ? styles.segmentBtnActive : ''}`}
               onClick={() => handleSelectBarbell(20)}
             >
-              20 kg (44 lbs Standard)
+              20 kg (Olympic)
             </button>
             <button
               type="button"
               className={`${styles.segmentBtn} ${barbellWt === 15 ? styles.segmentBtnActive : ''}`}
               onClick={() => handleSelectBarbell(15)}
             >
-              15 kg (33 lbs Women's)
+              15 kg (Women&apos;s)
             </button>
             <button
               type="button"
@@ -358,24 +353,24 @@ export const SettingsPage: React.FC = () => {
             </button>
           </div>
         </div>
-      </div>
+      </section>
 
-      {/* ===================== SECTION 3: WORKOUT & REST TIMER ===================== */}
-      <div className={styles.section}>
+      {/* ===================== SECTION 3: REST TIMER & HAPTICS ===================== */}
+      <section className={styles.section} aria-label="Rest Timer">
         <div className={styles.sectionHeader}>
-          <Timer size={18} color="var(--accent-primary)" />
-          <span>Workout Experience & Rest Timer</span>
+          <div className={styles.sectionHeaderIcon}>
+            <RestClockIcon size={15} strokeWidth={2.2} />
+          </div>
+          <span>Rest Timer & Haptics</span>
         </div>
         <p className={styles.sectionDesc}>
-          Ergonomic rest countdowns and audio feedback during intense sets.
+          Automated interval timer after each set completion.
         </p>
 
         {/* Default Duration Selector */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-          <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase' }}>
-            Default Rest Interval
-          </span>
-          <div className={styles.segmentedControl}>
+        <div className={styles.settingGroup}>
+          <label className={styles.groupLabel}>Default Interval</label>
+          <div className={styles.segmentedControl4}>
             {[60, 90, 120, 180].map((sec) => (
               <button
                 key={sec}
@@ -392,8 +387,8 @@ export const SettingsPage: React.FC = () => {
         {/* Toggles */}
         <div className={styles.settingRow}>
           <div className={styles.settingLabelGroup}>
-            <span className={styles.settingLabel}>Audio Chime on Finish</span>
-            <span className={styles.settingSub}>Plays an audible tone when your rest timer expires</span>
+            <span className={styles.settingLabel}>Timer Chime</span>
+            <span className={styles.settingSub}>Audio alert when rest countdown finishes</span>
           </div>
           <button
             type="button"
@@ -407,8 +402,8 @@ export const SettingsPage: React.FC = () => {
 
         <div className={styles.settingRow}>
           <div className={styles.settingLabelGroup}>
-            <span className={styles.settingLabel}>Auto-Start Rest Timer</span>
-            <span className={styles.settingSub}>Automatically starts countdown when you complete a set</span>
+            <span className={styles.settingLabel}>Auto-Start Timer</span>
+            <span className={styles.settingSub}>Starts rest countdown when a set is checked off</span>
           </div>
           <button
             type="button"
@@ -423,7 +418,7 @@ export const SettingsPage: React.FC = () => {
         <div className={styles.settingRow}>
           <div className={styles.settingLabelGroup}>
             <span className={styles.settingLabel}>Haptic Feedback</span>
-            <span className={styles.settingSub}>Vibrates device upon completed sets (supported phones)</span>
+            <span className={styles.settingSub}>Vibration pulses on set completion and timer end</span>
           </div>
           <button
             type="button"
@@ -434,65 +429,121 @@ export const SettingsPage: React.FC = () => {
             <div className={styles.toggleKnob} />
           </button>
         </div>
-      </div>
+      </section>
 
-      {/* ===================== SECTION 4: ACCOUNT & CLOUD SYNC ===================== */}
-      <div className={styles.section}>
+      {/* ===================== SECTION 4: APPEARANCE & THEMES ===================== */}
+      <section className={styles.section} aria-label="Theme Appearance">
         <div className={styles.sectionHeader}>
-          <Shield size={18} color="var(--accent-primary)" />
-          <span>Account & Cloud Sync</span>
-        </div>
-
-        <div className={styles.accountCard}>
-          <div>
-            <div className={styles.accountName}>
-              {currentUser ? currentUser.name || 'NextSet Lifter' : 'Anonymous Device Partition'}
-            </div>
-            <div className={styles.accountEmail}>
-              {currentUser ? currentUser.email : deviceId}
-            </div>
+          <div className={styles.sectionHeaderIcon}>
+            <Palette size={15} />
           </div>
-          <button
-            type="button"
-            className="btn-primary"
-            style={{ height: '36px', padding: '0 14px', fontSize: 'var(--font-xs)' }}
-            onClick={() => setIsAuthModalOpen(true)}
-          >
-            {currentUser ? 'Manage Account' : 'Sign In / Up'}
-          </button>
-        </div>
-
-        {syncStatusMsg && (
-          <div style={{ fontSize: 'var(--font-xs)', color: 'var(--success)' }}>
-            {syncStatusMsg}
-          </div>
-        )}
-
-        <button
-          type="button"
-          className="btn-secondary"
-          style={{ width: '100%', height: '42px', marginTop: 4 }}
-          onClick={handleManualSync}
-          disabled={isSyncing}
-        >
-          <RefreshCw size={15} className={isSyncing ? 'spin' : ''} />
-          <span>{isSyncing ? 'Syncing...' : 'Sync Cloud Backup Now'}</span>
-        </button>
-      </div>
-
-      {/* ===================== SECTION 5: DATA BACKUP & EXPORT ===================== */}
-      <div className={styles.section}>
-        <div className={styles.sectionHeader}>
-          <Download size={18} color="var(--accent-primary)" />
-          <span>Data Backup & Ownership</span>
+          <span>Theme & Appearance</span>
         </div>
         <p className={styles.sectionDesc}>
-          Export your entire workout history as a JSON file. Your data is stored locally in IndexedDB and belongs 100% to you.
+          Calibrated low-glare dark surfaces for gym illumination.
         </p>
 
-        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--font-xs)', color: 'var(--text-muted)' }}>
-          <span>Logged Sessions: <strong>{exportStats.sessions}</strong></span>
-          <span>Total Sets: <strong>{exportStats.sets}</strong></span>
+        {/* Background Surface Mode */}
+        <div className={styles.settingGroup}>
+          <label className={styles.groupLabel}>Surface Mode</label>
+          <div className={styles.segmentedControl}>
+            <button
+              type="button"
+              className={`${styles.segmentBtn} ${surface === 'pastel-dark' ? styles.segmentBtnActive : ''}`}
+              onClick={() => handleSelectSurface('pastel-dark')}
+            >
+              Obsidian Dark
+            </button>
+            <button
+              type="button"
+              className={`${styles.segmentBtn} ${surface === 'midnight' ? styles.segmentBtnActive : ''}`}
+              onClick={() => handleSelectSurface('midnight')}
+            >
+              Midnight Navy
+            </button>
+            <button
+              type="button"
+              className={`${styles.segmentBtn} ${surface === 'oled' ? styles.segmentBtnActive : ''}`}
+              onClick={() => handleSelectSurface('oled')}
+            >
+              OLED Black
+            </button>
+            <button
+              type="button"
+              className={`${styles.segmentBtn} ${surface === 'slate' ? styles.segmentBtnActive : ''}`}
+              onClick={() => handleSelectSurface('slate')}
+            >
+              Gunmetal Slate
+            </button>
+          </div>
+        </div>
+
+        {/* Accent Color Palette Swatches */}
+        <div className={styles.settingGroup}>
+          <label className={styles.groupLabel}>Accent Highlight</label>
+          <div className={styles.swatchesGrid}>
+            {ACCENT_PRESETS.map((preset) => {
+              const isSelected = accent === preset.id;
+              return (
+                <button
+                  key={preset.id}
+                  type="button"
+                  className={`${styles.swatchBtn} ${isSelected ? styles.swatchBtnActive : ''}`}
+                  style={
+                    isSelected
+                      ? {
+                          borderColor: preset.hex,
+                          backgroundColor: preset.subtleHex,
+                          boxShadow: `0 0 14px ${preset.subtleHex}`,
+                        }
+                      : undefined
+                  }
+                  onClick={() => handleSelectAccent(preset.id)}
+                >
+                  <div className={styles.swatchCircle} style={{ backgroundColor: preset.hex }}>
+                    {isSelected && (
+                      <Check
+                        size={12}
+                        strokeWidth={3}
+                        color={preset.contrastText || '#ffffff'}
+                      />
+                    )}
+                  </div>
+                  <span
+                    className={styles.swatchName}
+                    style={isSelected ? { color: preset.hex, fontWeight: 700 } : undefined}
+                  >
+                    {preset.name.replace('Pastel ', '')}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* ===================== SECTION 5: DATA & STORAGE ===================== */}
+      <section className={styles.section} aria-label="Data Storage">
+        <div className={styles.sectionHeader}>
+          <div className={styles.sectionHeaderIcon}>
+            <HardDrive size={15} />
+          </div>
+          <span>Offline Data & Backup</span>
+        </div>
+        <p className={styles.sectionDesc}>
+          Export full training history as open JSON for backup or spreadsheet analysis.
+        </p>
+
+        <div className={styles.statsCard}>
+          <div className={styles.statItem}>
+            <span className={styles.statNum}>{exportStats.sessions}</span>
+            <span className={styles.statLabel}>Saved Workouts</span>
+          </div>
+          <div className={styles.statDivider} />
+          <div className={styles.statItem}>
+            <span className={styles.statNum}>{exportStats.sets}</span>
+            <span className={styles.statLabel}>Logged Sets</span>
+          </div>
         </div>
 
         <button
@@ -500,15 +551,15 @@ export const SettingsPage: React.FC = () => {
           className={styles.exportBtn}
           onClick={handleExportData}
         >
-          <Download size={16} />
-          <span>Export Workout History (JSON)</span>
+          <Download size={15} />
+          <span>Export Backup (JSON)</span>
         </button>
-      </div>
+      </section>
 
       {/* App Info Footer */}
-      <div style={{ textAlign: 'center', fontSize: '11px', color: 'var(--text-disabled)', marginTop: 'var(--space-2)' }}>
-        NextSet Gym PWA · Version 1.0.0 · Offline Ready
-      </div>
+      <footer className={styles.footer}>
+        <span>NextSet · v1.0.0 · Offline-First Progressive Web App</span>
+      </footer>
 
       {/* Auth Modal */}
       <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />

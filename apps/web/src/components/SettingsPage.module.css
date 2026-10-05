@@ -1,145 +1,342 @@
 .container {
   display: flex;
   flex-direction: column;
-  padding: var(--space-4) var(--space-4) 120px;
-  gap: var(--space-4);
-  max-width: 480px;
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: 
+    radial-gradient(circle at 50% -20px, var(--accent-primary-subtle, rgba(139, 92, 246, 0.14)) 0%, transparent 65%),
+    var(--bg-primary, #0b0d18);
+  padding: 14px 16px calc(88px + env(safe-area-inset-bottom, 0px));
+  gap: 14px;
+  max-width: 520px;
   margin: 0 auto;
+  width: 100%;
+  transition: background 0.2s ease;
 }
 
+/* Top Header Bar */
 .topBar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding-bottom: var(--space-2);
-  border-bottom: 1px solid var(--border-subtle);
+  padding-bottom: 2px;
+}
+
+.headerLeft {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logoBadge {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: var(--accent-primary, #8b5cf6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 10px var(--accent-primary-subtle, rgba(139, 92, 246, 0.45));
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+
+.titleArea {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
 
 .pageTitle {
-  font-size: var(--font-xl);
-  font-weight: 800;
-  color: var(--text-primary);
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
+  font-size: 19px;
+  font-weight: 700;
+  color: var(--text-primary, #ffffff);
+  letter-spacing: -0.02em;
+  margin: 0;
+  line-height: 1.2;
 }
 
+.pageSubtitle {
+  font-size: 11.5px;
+  color: var(--text-muted, #94a3b8);
+}
+
+.userBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #f1f5f9;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 5px 10px;
+  border-radius: 999px;
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Card Sections */
 .section {
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-lg);
-  padding: var(--space-4);
+  background: var(--bg-surface-glass, rgba(18, 21, 35, 0.88));
+  border: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.08));
+  border-radius: 16px;
+  padding: 14px 16px;
   display: flex;
   flex-direction: column;
-  gap: var(--space-3);
-  box-shadow: var(--shadow-sm);
+  gap: 12px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+  transition: border-color 0.15s ease, background 0.2s ease;
+}
+
+.section:hover {
+  border-color: rgba(255, 255, 255, 0.14);
 }
 
 .sectionHeader {
   display: flex;
   align-items: center;
-  gap: var(--space-2);
-  color: var(--text-primary);
-  font-size: var(--font-base);
+  gap: 8px;
+  color: var(--text-primary, #ffffff);
+  font-size: 14px;
   font-weight: 700;
-  padding-bottom: 4px;
+}
+
+.sectionHeaderIcon {
+  width: 26px;
+  height: 26px;
+  border-radius: 8px;
+  background: var(--accent-primary-subtle, rgba(139, 92, 246, 0.15));
+  border: 1px solid var(--border-accent, rgba(139, 92, 246, 0.3));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent-primary, #a78bfa);
+  flex-shrink: 0;
+  transition: all 0.2s ease;
 }
 
 .sectionDesc {
-  font-size: var(--font-xs);
-  color: var(--text-secondary);
+  font-size: 12px;
+  color: var(--text-muted, #94a3b8);
   line-height: 1.4;
-  margin-top: -4px;
+  margin: -4px 0 0 0;
 }
 
-/* Theme Surface Selector */
-.segmentedControl {
+/* Account Info Card */
+.accountCard {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 12px 14px;
   display: flex;
-  background: var(--bg-tertiary);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-md);
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.accountDetails {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.accountAvatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: var(--accent-primary-subtle, rgba(139, 92, 246, 0.18));
+  border: 1px solid var(--border-accent, rgba(139, 92, 246, 0.35));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent-primary, #c084fc);
+  font-weight: 700;
+  font-size: 14px;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+
+.accountTexts {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.accountName {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--text-primary, #ffffff);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.accountEmail {
+  font-size: 11.5px;
+  color: var(--text-muted, #94a3b8);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.accountActionBtn {
+  background: var(--accent-primary-subtle, rgba(139, 92, 246, 0.16));
+  border: 1px solid var(--border-accent, rgba(139, 92, 246, 0.35));
+  color: var(--accent-primary, #c084fc);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 0.15s ease;
+}
+
+.accountActionBtn:hover,
+.accountActionBtn:active {
+  background: var(--accent-primary, #8b5cf6);
+  color: var(--text-accent-contrast, #ffffff);
+  border-color: var(--accent-primary, #8b5cf6);
+}
+
+.syncStatusMsg {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #10b981;
+  padding: 4px 8px;
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  border-radius: 8px;
+  align-self: flex-start;
+}
+
+.syncBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 42px;
+  width: 100%;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  color: var(--text-primary, #ffffff);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.syncBtn:hover,
+.syncBtn:active {
+  background: var(--accent-primary-subtle, rgba(139, 92, 246, 0.15));
+  border-color: var(--accent-primary, rgba(139, 92, 246, 0.4));
+  color: var(--accent-primary, #c084fc);
+}
+
+.spin {
+  animation: spinAnim 1s linear infinite;
+}
+
+@keyframes spinAnim {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Setting Groups */
+.settingGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.groupLabel {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-secondary, #cbd5e1);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* Segmented Controls */
+.segmentedControl {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 3px;
+  gap: 4px;
+}
+
+.segmentedControl3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 3px;
+  gap: 4px;
+}
+
+.segmentedControl4 {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
   padding: 3px;
   gap: 4px;
 }
 
 .segmentBtn {
-  flex: 1;
   background: transparent;
   border: none;
-  color: var(--text-muted);
-  font-size: var(--font-xs);
-  font-weight: 700;
+  color: var(--text-muted, #94a3b8);
+  font-size: 12px;
+  font-weight: 600;
   padding: 8px 10px;
-  border-radius: var(--radius-sm);
+  border-radius: 9px;
   cursor: pointer;
-  transition: all var(--transition-fast);
+  transition: all 0.15s ease;
   text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.segmentBtn:hover {
+  color: var(--text-primary, #ffffff);
 }
 
 .segmentBtnActive {
-  background: var(--accent-primary);
+  background: var(--accent-primary, #8b5cf6);
   color: var(--text-accent-contrast, #ffffff);
-  box-shadow: var(--shadow-sm);
+  box-shadow: 0 2px 8px var(--accent-primary-subtle, rgba(139, 92, 246, 0.35));
 }
 
-/* Accent Swatches */
-.swatchesGrid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: var(--space-2);
-}
-
-.swatchBtn {
-  background: var(--bg-tertiary);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-md);
-  padding: var(--space-3) var(--space-2);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-  cursor: pointer;
-  transition: all var(--transition-fast);
-}
-
-.swatchBtn:hover {
-  border-color: var(--border-medium);
-  background: var(--bg-elevated);
-}
-
-.swatchBtnActive {
-  border-color: var(--accent-primary);
-  background: var(--accent-primary-subtle);
-}
-
-.swatchCircle {
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #ffffff;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
-}
-
-.swatchName {
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--text-primary);
-}
-
-/* Setting Row with Toggle */
+/* Setting Rows with Toggles */
 .settingRow {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: var(--space-2) 0;
-  border-bottom: 1px solid var(--border-subtle);
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .settingRow:last-child {
   border-bottom: none;
+  padding-bottom: 0;
 }
 
 .settingLabelGroup {
@@ -149,114 +346,167 @@
 }
 
 .settingLabel {
-  font-size: var(--font-sm);
-  font-weight: 700;
-  color: var(--text-primary);
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text-primary, #ffffff);
 }
 
 .settingSub {
-  font-size: 11px;
-  color: var(--text-muted);
+  font-size: 11.5px;
+  color: var(--text-muted, #94a3b8);
+  line-height: 1.3;
 }
 
 .toggleSwitch {
   width: 44px;
-  height: 24px;
-  border-radius: var(--radius-full);
-  background: var(--bg-tertiary);
-  border: 1px solid var(--border-medium);
+  height: 26px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   position: relative;
   cursor: pointer;
-  transition: background var(--transition-fast), border-color var(--transition-fast);
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .toggleSwitchActive {
-  background: var(--accent-primary);
-  border-color: var(--accent-primary);
+  background: #10b981;
+  border-color: #10b981;
+  box-shadow: 0 2px 10px rgba(16, 185, 129, 0.35);
 }
 
 .toggleKnob {
-  width: 18px;
-  height: 18px;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
   background: #ffffff;
   position: absolute;
   top: 2px;
   left: 2px;
-  transition: transform var(--transition-fast);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
 }
 
 .toggleSwitchActive .toggleKnob {
-  transform: translateX(20px);
+  transform: translateX(18px);
 }
 
-/* Live Preview Card */
-.previewBox {
-  background: var(--bg-tertiary);
-  border: 1px solid var(--border-medium);
-  border-radius: var(--radius-md);
-  padding: var(--space-3) var(--space-4);
+/* Swatches Grid */
+.swatchesGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.swatchBtn {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 10px 8px;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: space-between;
-  margin-top: 4px;
+  gap: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
 }
 
-.previewText {
-  font-size: var(--font-xs);
-  color: var(--text-secondary);
+.swatchBtn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.18);
 }
 
-.previewBadge {
-  background: var(--accent-primary);
-  color: var(--text-accent-contrast, #ffffff);
-  font-size: 11px;
-  font-weight: 800;
-  padding: 4px 10px;
-  border-radius: var(--radius-full);
+.swatchBtnActive {
+  border-color: var(--accent-primary, #8b5cf6);
+  background: var(--accent-primary-subtle, rgba(139, 92, 246, 0.15));
 }
 
-/* Account Info Card */
-.accountCard {
-  background: var(--bg-tertiary);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-md);
-  padding: var(--space-3) var(--space-4);
+.swatchCircle {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.accountName {
-  font-size: var(--font-sm);
-  font-weight: 700;
-  color: var(--text-primary);
-}
-
-.accountEmail {
-  font-size: var(--font-xs);
-  color: var(--accent-primary);
-}
-
-.exportBtn {
-  display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: var(--space-2);
-  width: 100%;
-  height: 44px;
-  background: var(--bg-tertiary);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-md);
-  color: var(--text-primary);
-  font-size: var(--font-sm);
-  font-weight: 700;
-  cursor: pointer;
-  transition: all var(--transition-fast);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
 }
 
-.exportBtn:hover, .exportBtn:active {
-  background: var(--bg-elevated);
-  border-color: var(--accent-primary);
+.swatchName {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--text-primary, #ffffff);
+}
+
+/* Stats Card in Data Section */
+.statsCard {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+}
+
+.statItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.statNum {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text-primary, #ffffff);
+  font-variant-numeric: tabular-nums;
+}
+
+.statLabel {
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--text-muted, #94a3b8);
+}
+
+.statDivider {
+  width: 1px;
+  height: 28px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* Export Button */
+.exportBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 42px;
+  width: 100%;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  color: var(--text-primary, #ffffff);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.exportBtn:hover,
+.exportBtn:active {
+  background: var(--accent-primary-subtle, rgba(139, 92, 246, 0.15));
+  border-color: var(--accent-primary, rgba(139, 92, 246, 0.4));
+  color: var(--accent-primary, #c084fc);
+}
+
+/* Footer */
+.footer {
+  text-align: center;
+  font-size: 11px;
+  color: var(--text-disabled, #64748b);
+  padding: 8px 0;
 }
