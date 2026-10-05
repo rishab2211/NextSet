@@ -8,9 +8,16 @@ class SyncCoordinator {
   private isSyncing = false;
   private isPulling = false;
   private authDebounceTimer: any = null;
+  private lastSyncTime: Date | null = null;
+  private listeners: Set<(state: { isSyncing: boolean; lastSyncTime: Date | null }) => void> = new Set();
 
   constructor() {
     if (typeof window !== 'undefined') {
+      try {
+        const saved = localStorage.getItem('nextset_last_sync');
+        if (saved) this.lastSyncTime = new Date(saved);
+      } catch (_) {}
+
       window.addEventListener('online', () => {
         console.log('[SyncCoordinator] Device came online, triggering sync recovery.');
         this.sync();
@@ -27,6 +34,45 @@ class SyncCoordinator {
       window.addEventListener('nextset_auth_change', handleAuthChange);
       window.addEventListener('kinetic_auth_change', handleAuthChange);
     }
+  }
+
+  private updateSyncTime() {
+    this.lastSyncTime = new Date();
+    try {
+      localStorage.setItem('nextset_last_sync', this.lastSyncTime.toISOString());
+    } catch (_) {}
+  }
+
+  private notify() {
+    const isSyncing = this.isSyncing || this.isPulling;
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(
+        new CustomEvent('nextset_sync_state_change', {
+          detail: { isSyncing, lastSyncTime: this.lastSyncTime },
+        })
+      );
+    }
+    this.listeners.forEach((listener) => {
+      try {
+        listener({ isSyncing, lastSyncTime: this.lastSyncTime });
+      } catch (_) {}
+    });
+  }
+
+  public subscribe(listener: (state: { isSyncing: boolean; lastSyncTime: Date | null }) => void): () => void {
+    this.listeners.add(listener);
+    listener({ isSyncing: this.getIsSyncing(), lastSyncTime: this.lastSyncTime });
+    return () => {
+      this.listeners.delete(listener);
+    };
+  }
+
+  public getIsSyncing(): boolean {
+    return this.isSyncing || this.isPulling;
+  }
+
+  public getLastSyncTime(): Date | null {
+    return this.lastSyncTime;
   }
 
   private getAuthHeaders(): HeadersInit {
@@ -53,6 +99,7 @@ class SyncCoordinator {
 
     try {
       this.isSyncing = true;
+      this.notify();
 
       // 1. Check if queue has pending items
       const queueCount = await db.syncQueue.count();
@@ -104,6 +151,7 @@ class SyncCoordinator {
         // Clear processed items from syncQueue
         const processedIds = queueItems.map((q) => q.id!).filter(Boolean);
         await db.syncQueue.bulkDelete(processedIds);
+        this.updateSyncTime();
         console.log(
           `[SyncCoordinator] Sync succeeded. Applied ${result.applied_sessions} sessions, ${result.applied_sets} sets.`
         );
@@ -115,6 +163,7 @@ class SyncCoordinator {
       return null;
     } finally {
       this.isSyncing = false;
+      this.notify();
     }
   }
 
@@ -127,6 +176,8 @@ class SyncCoordinator {
 
     try {
       this.isPulling = true;
+      this.notify();
+
       const response = await fetch(`${API_BASE}/api/sync?since=${encodeURIComponent(since)}`, {
         method: 'GET',
         headers: this.getAuthHeaders(),
@@ -150,12 +201,42 @@ class SyncCoordinator {
         console.log(`[SyncCoordinator] Pulled ${sessions.length} sessions, ${sets.length} sets from D1 cloud.`);
       }
 
+      this.updateSyncTime();
       return true;
     } catch (err) {
       console.warn('[SyncCoordinator] Pull failed or timed out', err);
       return false;
     } finally {
       this.isPulling = false;
+      this.notify();
+    }
+  }
+
+  /**
+   * Forces an immediate push and pull sync cycle, returning comprehensive summary
+   */
+  public async syncAndPull(): Promise<{ success: boolean; pushed: number; pulled: number }> {
+    let pushed = 0;
+    try {
+      const syncResult = await this.sync();
+      if (syncResult && syncResult.success) {
+        pushed = (syncResult.applied_sessions || 0) + (syncResult.applied_sets || 0);
+      }
+
+      const pullSuccess = await this.pull();
+      if (pullSuccess || !syncResult) {
+        this.updateSyncTime();
+        this.notify();
+      }
+
+      return {
+        success: true,
+        pushed,
+        pulled: 0,
+      };
+    } catch (err) {
+      console.warn('[SyncCoordinator] syncAndPull failed:', err);
+      return { success: false, pushed: 0, pulled: 0 };
     }
   }
 }

@@ -38,7 +38,6 @@
 }
 
 /* Ensure foreground content sits above hero background */
-.topBar,
 .activeBanner,
 .heroContent,
 .howItWorksCard,
@@ -51,6 +50,8 @@
 
 /* Top Navigation Bar */
 .topBar {
+  position: relative;
+  z-index: 30;
   display: flex;
   align-items: center;
   justify-content: space-between;

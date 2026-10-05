@@ -5,11 +5,10 @@ import type { WorkoutSession, AuthUser } from '@nextset/shared';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../lib/db';
 import { AuthModal } from './AuthModal';
+import { SyncStatusButton } from './SyncStatusButton';
 import { getCurrentUser } from '../lib/auth/authStore';
 import {
   Play,
-  Wifi,
-  WifiOff,
   ArrowRight,
   Flame,
   User,
@@ -38,7 +37,6 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
   onDiscardWorkout,
   onStartNewWorkout,
 }) => {
-  const [isOnline, setIsOnline] = useState<boolean>(true);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(false);
   const [currentUser, setCurrentUser] = useState<AuthUser | null>(null);
   const [isDiscardConfirmOpen, setIsDiscardConfirmOpen] = useState<boolean>(false);
@@ -110,20 +108,15 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
   }, []);
 
   useEffect(() => {
-    setIsOnline(navigator.onLine);
     setCurrentUser(getCurrentUser());
 
-    const handleOnline = () => setIsOnline(true);
-    const handleOffline = () => setIsOnline(false);
     const handleAuthChange = () => setCurrentUser(getCurrentUser());
 
-    window.addEventListener('online', handleOnline);
-    window.addEventListener('offline', handleOffline);
+    window.addEventListener('nextset_auth_change', handleAuthChange);
     window.addEventListener('kinetic_auth_change', handleAuthChange);
 
     return () => {
-      window.removeEventListener('online', handleOnline);
-      window.removeEventListener('offline', handleOffline);
+      window.removeEventListener('nextset_auth_change', handleAuthChange);
       window.removeEventListener('kinetic_auth_change', handleAuthChange);
     };
   }, []);
@@ -183,16 +176,7 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
             <ChevronDown size={12} color="#94a3b8" />
           </button>
 
-          <span
-            className={`${styles.syncBadge} ${isOnline ? styles.syncBadgeOnline : styles.syncBadgeOffline}`}
-          >
-            {isOnline ? (
-              <Wifi size={11} strokeWidth={2.5} />
-            ) : (
-              <WifiOff size={11} strokeWidth={2.5} />
-            )}
-            <span>{isOnline ? 'Synced' : 'Offline'}</span>
-          </span>
+          <SyncStatusButton onOpenAuth={() => setIsAuthModalOpen(true)} />
         </div>
       </header>
 

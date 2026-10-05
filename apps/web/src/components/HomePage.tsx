@@ -3,11 +3,10 @@
 import React, { useState, useEffect } from "react";
 import type { WorkoutSession, AuthUser } from "@nextset/shared";
 import { AuthModal } from "./AuthModal";
+import { SyncStatusButton } from "./SyncStatusButton";
 import { getCurrentUser } from "../lib/auth/authStore";
 import {
   Play,
-  Wifi,
-  WifiOff,
   ArrowRight,
   User,
   ChevronDown,
@@ -45,7 +44,6 @@ export const HomePage: React.FC<HomePageProps> = ({
   onNavigateToWorkout,
   onNavigateToAnatomy,
 }) => {
-  const [isOnline, setIsOnline] = useState<boolean>(true);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(false);
   const [currentUser, setCurrentUser] = useState<AuthUser | null>(null);
   const [installPrompt, setInstallPrompt] = useState<any>(null);
@@ -59,7 +57,6 @@ export const HomePage: React.FC<HomePageProps> = ({
   const [isDiscarding, setIsDiscarding] = useState<boolean>(false);
 
   useEffect(() => {
-    setIsOnline(navigator.onLine);
     setCurrentUser(getCurrentUser());
 
     const isStandalone =
@@ -84,14 +81,10 @@ export const HomePage: React.FC<HomePageProps> = ({
       setInstallPrompt(null);
     };
 
-    const handleOnline = () => setIsOnline(true);
-    const handleOffline = () => setIsOnline(false);
     const handleAuthChange = () => setCurrentUser(getCurrentUser());
 
     window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
     window.addEventListener("appinstalled", handleAppInstalled);
-    window.addEventListener("online", handleOnline);
-    window.addEventListener("offline", handleOffline);
     window.addEventListener("kinetic_auth_change", handleAuthChange);
 
     return () => {
@@ -100,8 +93,6 @@ export const HomePage: React.FC<HomePageProps> = ({
         handleBeforeInstallPrompt,
       );
       window.removeEventListener("appinstalled", handleAppInstalled);
-      window.removeEventListener("online", handleOnline);
-      window.removeEventListener("offline", handleOffline);
       window.removeEventListener("kinetic_auth_change", handleAuthChange);
     };
   }, []);
@@ -181,16 +172,7 @@ export const HomePage: React.FC<HomePageProps> = ({
             <ChevronDown size={12} color="#94a3b8" />
           </button>
 
-          <span
-            className={`${styles.syncBadge} ${isOnline ? styles.syncBadgeOnline : styles.syncBadgeOffline}`}
-          >
-            {isOnline ? (
-              <Wifi size={11} strokeWidth={2.5} />
-            ) : (
-              <WifiOff size={11} strokeWidth={2.5} />
-            )}
-            <span>{isOnline ? "Synced" : "Offline"}</span>
-          </span>
+          <SyncStatusButton onOpenAuth={() => setIsAuthModalOpen(true)} />
         </div>
       </header>
 
