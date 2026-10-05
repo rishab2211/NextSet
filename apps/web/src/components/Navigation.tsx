@@ -1,10 +1,11 @@
-'use client';
+"use client";
 
-import React from 'react';
-import { Dumbbell, BookOpen, History, Settings } from 'lucide-react';
-import styles from './Navigation.module.css';
+import React from "react";
+import { Home, History, Settings } from "lucide-react";
+import { DumbbellHorizontalIcon, OpenBookIcon } from "./HomeIcons";
+import styles from "./Navigation.module.css";
 
-export type NavTab = 'workout' | 'exercises' | 'history' | 'settings';
+export type NavTab = "home" | "workout" | "exercises" | "history" | "settings";
 
 interface NavigationProps {
   currentTab: NavTab;
@@ -19,37 +20,46 @@ export const Navigation: React.FC<NavigationProps> = ({
     <nav className={styles.navBar}>
       <button
         type="button"
-        className={`${styles.navItem} ${currentTab === 'workout' ? styles.navItemActive : ''}`}
-        onClick={() => onTabChange('workout')}
+        className={`${styles.navItem} ${currentTab === "home" ? styles.navItemActive : ""}`}
+        onClick={() => onTabChange("home")}
       >
-        <Dumbbell size={22} />
+        <Home size={18} />
+        <span>Home</span>
+      </button>
+
+      <button
+        type="button"
+        className={`${styles.navItem} ${currentTab === "workout" ? styles.navItemActive : ""}`}
+        onClick={() => onTabChange("workout")}
+      >
+        <DumbbellHorizontalIcon size={18} strokeWidth={2} />
         <span>Workout</span>
       </button>
 
       <button
         type="button"
-        className={`${styles.navItem} ${currentTab === 'exercises' ? styles.navItemActive : ''}`}
-        onClick={() => onTabChange('exercises')}
+        className={`${styles.navItem} ${currentTab === "exercises" ? styles.navItemActive : ""}`}
+        onClick={() => onTabChange("exercises")}
       >
-        <BookOpen size={22} />
-        <span>Anatomy</span>
+        <OpenBookIcon size={18} strokeWidth={2} />
+        <span>Exercises</span>
       </button>
 
       <button
         type="button"
-        className={`${styles.navItem} ${currentTab === 'history' ? styles.navItemActive : ''}`}
-        onClick={() => onTabChange('history')}
+        className={`${styles.navItem} ${currentTab === "history" ? styles.navItemActive : ""}`}
+        onClick={() => onTabChange("history")}
       >
-        <History size={22} />
+        <History size={18} />
         <span>History</span>
       </button>
 
       <button
         type="button"
-        className={`${styles.navItem} ${currentTab === 'settings' ? styles.navItemActive : ''}`}
-        onClick={() => onTabChange('settings')}
+        className={`${styles.navItem} ${currentTab === "settings" ? styles.navItemActive : ""}`}
+        onClick={() => onTabChange("settings")}
       >
-        <Settings size={22} />
+        <Settings size={18} />
         <span>Settings</span>
       </button>
     </nav>
