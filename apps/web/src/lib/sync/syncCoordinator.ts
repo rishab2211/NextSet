@@ -6,6 +6,8 @@ const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8787';
 
 class SyncCoordinator {
   private isSyncing = false;
+  private isPulling = false;
+  private authDebounceTimer: any = null;
 
   constructor() {
     if (typeof window !== 'undefined') {
@@ -15,8 +17,11 @@ class SyncCoordinator {
       });
 
       const handleAuthChange = () => {
-        console.log('[SyncCoordinator] Auth state changed, triggering full sync & pull.');
-        this.sync().then(() => this.pull());
+        if (this.authDebounceTimer) clearTimeout(this.authDebounceTimer);
+        this.authDebounceTimer = setTimeout(() => {
+          console.log('[SyncCoordinator] Auth state changed, triggering full sync & pull.');
+          this.sync().then(() => this.pull());
+        }, 200);
       };
 
       window.addEventListener('nextset_auth_change', handleAuthChange);
@@ -81,11 +86,12 @@ class SyncCoordinator {
         last_sync_timestamp: new Date().toISOString(),
       };
 
-      // 3. Dispatch to Cloudflare Worker
+      // 3. Dispatch to Cloudflare Worker with timeout guard
       const response = await fetch(`${API_BASE}/api/sync`, {
         method: 'POST',
         headers: this.getAuthHeaders(),
         body: JSON.stringify(payload),
+        signal: AbortSignal.timeout(8000),
       });
 
       if (!response.ok) {
@@ -105,7 +111,7 @@ class SyncCoordinator {
 
       return result;
     } catch (err) {
-      console.warn('[SyncCoordinator] Sync failed, will retry on next connection.', err);
+      console.warn('[SyncCoordinator] Sync failed or timed out, will retry on next connection.', err);
       return null;
     } finally {
       this.isSyncing = false;
@@ -116,12 +122,15 @@ class SyncCoordinator {
    * Pulls remote workouts from Cloudflare D1 for the authenticated user
    */
   public async pull(since: string = '1970-01-01T00:00:00.000Z'): Promise<boolean> {
+    if (this.isPulling) return false;
     if (typeof navigator !== 'undefined' && !navigator.onLine) return false;
 
     try {
+      this.isPulling = true;
       const response = await fetch(`${API_BASE}/api/sync?since=${encodeURIComponent(since)}`, {
         method: 'GET',
         headers: this.getAuthHeaders(),
+        signal: AbortSignal.timeout(8000),
       });
 
       if (!response.ok) return false;
@@ -143,8 +152,10 @@ class SyncCoordinator {
 
       return true;
     } catch (err) {
-      console.warn('[SyncCoordinator] Pull failed', err);
+      console.warn('[SyncCoordinator] Pull failed or timed out', err);
       return false;
+    } finally {
+      this.isPulling = false;
     }
   }
 }

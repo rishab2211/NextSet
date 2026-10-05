@@ -74,6 +74,36 @@ export function getCurrentUser(): AuthUser | null {
   }
 }
 
+/**
+ * Associates any local workouts created anonymously with the newly signed-in user
+ */
+export async function claimLocalWorkoutsForUser(userId: string): Promise<void> {
+  if (typeof window === 'undefined') return;
+  const now = new Date().toISOString();
+  try {
+    await db.transaction('rw', db.workoutSessions, db.syncQueue, async () => {
+      const unlinked = await db.workoutSessions
+        .filter((s) => s.user_id !== userId)
+        .toArray();
+
+      for (const session of unlinked) {
+        await db.workoutSessions.update(session.id, {
+          user_id: userId,
+          updated_at: now,
+        });
+        await db.syncQueue.add({
+          entity_type: 'session',
+          entity_id: session.id,
+          action: 'update',
+          timestamp: now,
+        });
+      }
+    });
+  } catch (err) {
+    console.warn('[AuthStore] Could not claim local workouts:', err);
+  }
+}
+
 export function saveAuthSession(token: string, user: AuthUser): void {
   if (typeof window === 'undefined') return;
   localStorage.setItem(STORAGE_KEY_TOKEN, token);
@@ -83,6 +113,9 @@ export function saveAuthSession(token: string, user: AuthUser): void {
   }
   if (user.barbell_weight) {
     localStorage.setItem(STORAGE_KEY_BAR_WEIGHT, user.barbell_weight.toString());
+  }
+  if (user.id && !user.is_anonymous) {
+    claimLocalWorkoutsForUser(user.id);
   }
   window.dispatchEvent(new Event('nextset_auth_change'));
   window.dispatchEvent(new Event('kinetic_auth_change'));
@@ -199,6 +232,7 @@ export async function signUpWithPassword(
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
+      signal: AbortSignal.timeout(8000),
     });
 
     const data = await res.json();
@@ -270,6 +304,7 @@ export async function signInWithPassword(
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
+      signal: AbortSignal.timeout(8000),
     });
 
     const data = await res.json();
@@ -338,6 +373,7 @@ export async function updateUserProfile(
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(updates),
+        signal: AbortSignal.timeout(8000),
       });
     } catch {
       // Non-fatal if offline
@@ -371,6 +407,7 @@ export async function changeUserPassword(
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ current_password: currentPassword, new_password: newPassword }),
+        signal: AbortSignal.timeout(8000),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -462,6 +499,7 @@ export async function sendOtpCode(email: string): Promise<{ success: boolean; pr
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
+      signal: AbortSignal.timeout(8000),
     });
 
     const data = await res.json();
@@ -505,6 +543,7 @@ export async function verifyOtpCode(email: string, code: string): Promise<{ succ
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
+      signal: AbortSignal.timeout(8000),
     });
 
     const data: AuthTokenResponse = await res.json();
