@@ -108,8 +108,10 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
       loadStats();
     };
 
+    window.addEventListener('nextset_auth_change', handleAuthChange);
     window.addEventListener('kinetic_auth_change', handleAuthChange);
     return () => {
+      window.removeEventListener('nextset_auth_change', handleAuthChange);
       window.removeEventListener('kinetic_auth_change', handleAuthChange);
     };
   }, [isOpen]);
@@ -139,8 +141,11 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
     if (res.success && res.user) {
       setCurrentUser(res.user);
       setPassword('');
-      setSuccessMsg('Welcome back! Signed in successfully.');
+      setSuccessMsg('Signed in successfully.');
       triggerSyncAndPull();
+      setTimeout(() => {
+        onClose();
+      }, 600);
     } else {
       setErrorMsg(res.error || 'Failed to sign in.');
     }
@@ -179,8 +184,11 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
       setCurrentUser(res.user);
       setPassword('');
       setConfirmPassword('');
-      setSuccessMsg('Account created successfully! Your device workouts are now claimed.');
+      setSuccessMsg('Account created successfully!');
       triggerSyncAndPull();
+      setTimeout(() => {
+        onClose();
+      }, 600);
     } else {
       setErrorMsg(res.error || 'Failed to create account.');
     }
@@ -229,23 +237,30 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
 
     if (res.success && res.user) {
       setCurrentUser(res.user);
-      setSuccessMsg('Successfully authenticated via Magic OTP!');
+      setSuccessMsg('Signed in successfully!');
       setOtpStep('email');
       setOtpCode('');
       setPreviewCode(null);
       triggerSyncAndPull();
+      setTimeout(() => {
+        onClose();
+      }, 600);
     } else {
       setErrorMsg(res.error || 'Invalid or expired code.');
     }
   };
 
-  // Trigger Cloud Sync and Pull
+  // Trigger Cloud Sync and Pull with 6-second safety cap
   const triggerSyncAndPull = async () => {
     setSyncing(true);
     try {
-      await syncCoordinator.sync();
-      await syncCoordinator.pull();
+      await Promise.race([
+        Promise.all([syncCoordinator.sync(), syncCoordinator.pull()]),
+        new Promise((resolve) => setTimeout(resolve, 6000)),
+      ]);
       await loadStats();
+    } catch (err) {
+      console.warn('[AuthModal] Background sync error:', err);
     } finally {
       setSyncing(false);
     }
@@ -309,7 +324,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
   const handleSignOut = () => {
     clearAuthSession();
     setCurrentUser(null);
-    setSuccessMsg('Signed out. Switched back to isolated anonymous device partition.');
+    setSuccessMsg('Signed out.');
   };
 
   // Compute initials for avatar
@@ -332,7 +347,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
         <div className={styles.header}>
           <div className={styles.headerTitle}>
             <Shield size={18} color="var(--accent-cyan)" />
-            <span>{currentUser ? 'User Account & Profile' : 'Account & Cloud Sync'}</span>
+            <span>{currentUser ? 'Account' : 'Sign In'}</span>
           </div>
           <button type="button" className={styles.closeBtn} onClick={onClose}>
             <X size={18} />
@@ -362,7 +377,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
               }}
             >
               <User size={14} />
-              <span>Create Account</span>
+              <span>Sign Up</span>
             </button>
             <button
               type="button"
@@ -373,7 +388,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
               }}
             >
               <Sparkles size={14} />
-              <span>Magic OTP</span>
+              <span>Email Code</span>
             </button>
           </div>
         )}
@@ -394,7 +409,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
                   <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 4 }}>
                     <span className="badge badge-cyan" style={{ fontSize: '10px', padding: '2px 6px' }}>
                       <CheckCircle2 size={10} />
-                      <span>Workers JWT Active</span>
+                      <span>Synced</span>
                     </span>
                   </div>
                 </div>
@@ -404,11 +419,11 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
               <div className={styles.statsGrid}>
                 <div className={styles.statCard}>
                   <span className={styles.statNumber}>{stats?.total_workouts ?? 0}</span>
-                  <span className={styles.statLabel}>Workouts Logged</span>
+                  <span className={styles.statLabel}>Workouts</span>
                 </div>
                 <div className={styles.statCard}>
                   <span className={styles.statNumber}>{stats?.total_sets ?? 0}</span>
-                  <span className={styles.statLabel}>Total Sets Completed</span>
+                  <span className={styles.statLabel}>Sets</span>
                 </div>
                 <div className={styles.statCard}>
                   <span className={styles.statNumber}>
@@ -416,7 +431,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
                       ? Math.round((stats?.total_volume_kg ?? 0) * 2.20462).toLocaleString() + ' lbs'
                       : (stats?.total_volume_kg ?? 0).toLocaleString() + ' kg'}
                   </span>
-                  <span className={styles.statLabel}>Total Volume Lifted</span>
+                  <span className={styles.statLabel}>Volume</span>
                 </div>
                 <div className={styles.statCard}>
                   <span className={styles.statNumber} style={{ color: 'var(--accent-volt)' }}>
@@ -424,25 +439,25 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
                       ? new Date(stats.last_workout_date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
                       : 'None'}
                   </span>
-                  <span className={styles.statLabel}>Last Active</span>
+                  <span className={styles.statLabel}>Last workout</span>
                 </div>
               </div>
 
               {/* Preferences: Units & Barbell Weight */}
               <div className={styles.formGroup}>
                 <div className={styles.field}>
-                  <label className={styles.inputLabel}>Display Name</label>
+                  <label className={styles.inputLabel}>Name</label>
                   <input
                     type="text"
                     className={styles.inputField}
                     value={profileName}
                     onChange={(e) => setProfileName(e.target.value)}
-                    placeholder="Your Name / Handle"
+                    placeholder="Your name"
                   />
                 </div>
 
                 <div className={styles.field}>
-                  <label className={styles.inputLabel}>Default Weight Unit</label>
+                  <label className={styles.inputLabel}>Weight unit</label>
                   <div className={styles.segmentedControl}>
                     <button
                       type="button"
@@ -462,7 +477,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
                 </div>
 
                 <div className={styles.field}>
-                  <label className={styles.inputLabel}>Olympic Barbell Weight</label>
+                  <label className={styles.inputLabel}>Barbell weight</label>
                   <div className={styles.segmentedControl}>
                     <button
                       type="button"
@@ -488,7 +503,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
                   onClick={handleSavePreferences}
                   disabled={loading}
                 >
-                  <span>{loading ? 'Saving...' : 'Save Preferences'}</span>
+                  <span>{loading ? 'Saving...' : 'Save'}</span>
                 </button>
               </div>
 
@@ -558,7 +573,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
                   disabled={syncing}
                 >
                   <RefreshCw size={15} className={syncing ? 'spin' : ''} />
-                  <span>{syncing ? 'Syncing...' : 'Sync Cloud Now'}</span>
+                  <span>{syncing ? 'Syncing...' : 'Sync now'}</span>
                 </button>
                 <button
                   type="button"
@@ -619,7 +634,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
                     disabled={loading}
                   >
                     <Lock size={16} />
-                    <span>{loading ? 'Signing In...' : 'Sign In with Password'}</span>
+                    <span>{loading ? 'Signing in...' : 'Sign In'}</span>
                   </button>
 
                   <div style={{ textAlign: 'center', fontSize: 'var(--font-xs)', color: 'var(--text-muted)' }}>
@@ -639,11 +654,11 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
               {tab === 'signup' && (
                 <form onSubmit={handleSignUp} className={styles.formGroup}>
                   <div className={styles.field}>
-                    <label className={styles.inputLabel}>Full Name / Nickname</label>
+                    <label className={styles.inputLabel}>Name</label>
                     <input
                       type="text"
                       className={styles.inputField}
-                      placeholder="e.g. Alex Henderson"
+                      placeholder="Your name"
                       value={name}
                       onChange={(e) => setName(e.target.value)}
                     />
@@ -696,7 +711,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
                   </div>
 
                   <div className={styles.field}>
-                    <label className={styles.inputLabel}>Preferred Weight Unit</label>
+                    <label className={styles.inputLabel}>Weight unit</label>
                     <div className={styles.segmentedControl}>
                       <button
                         type="button"
@@ -722,7 +737,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
                     disabled={loading}
                   >
                     <User size={16} />
-                    <span>{loading ? 'Creating Account...' : 'Create Account & Claim Workouts'}</span>
+                    <span>{loading ? 'Creating account...' : 'Create Account'}</span>
                   </button>
 
                   <div style={{ textAlign: 'center', fontSize: 'var(--font-xs)', color: 'var(--text-muted)' }}>
@@ -744,7 +759,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
                   {otpStep === 'email' ? (
                     <form onSubmit={handleSendOtp} className={styles.formGroup}>
                       <p style={{ fontSize: 'var(--font-xs)', color: 'var(--text-muted)', marginBottom: 4 }}>
-                        Get a passwordless 6-digit code delivered to your inbox for instant authentication.
+                        We&apos;ll email you a 6-digit login code.
                       </p>
 
                       <div className={styles.field}>
@@ -767,13 +782,13 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
                         disabled={loading}
                       >
                         <Mail size={16} />
-                        <span>{loading ? 'Sending Code...' : 'Send Magic OTP Code'}</span>
+                        <span>{loading ? 'Sending...' : 'Send Code'}</span>
                       </button>
                     </form>
                   ) : (
                     <form onSubmit={handleVerifyOtp} className={styles.formGroup}>
                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                        <span className={styles.inputLabel}>Enter 6-Digit Code</span>
+                        <span className={styles.inputLabel}>Enter 6-digit code</span>
                         <button
                           type="button"
                           style={{ background: 'none', border: 'none', color: 'var(--accent-cyan)', fontSize: '11px', cursor: 'pointer' }}
@@ -815,7 +830,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
                         disabled={loading || otpCode.length < 6}
                       >
                         <KeyRound size={16} />
-                        <span>{loading ? 'Verifying...' : 'Verify Code & Sign In'}</span>
+                        <span>{loading ? 'Verifying...' : 'Verify & Sign In'}</span>
                       </button>
                     </form>
                   )}
@@ -829,12 +844,12 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
             <div className={styles.partitionHeader}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                 <Smartphone size={14} color="var(--accent-volt)" />
-                <span className={styles.partitionLabel}>Local Device Partition</span>
+                <span className={styles.partitionLabel}>Device ID</span>
               </div>
               <span className={styles.deviceIdBadge}>{deviceId || 'Detecting...'}</span>
             </div>
             <p className={styles.partitionText}>
-              All workouts you log are stored locally in IndexedDB first. An account lets you back up and restore your workout history across phones and tablets.
+              Workouts are saved on this phone first. Sign in to sync across devices.
             </p>
           </div>
         </div>
