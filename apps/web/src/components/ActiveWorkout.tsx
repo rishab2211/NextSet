@@ -26,17 +26,18 @@ import { getUnitPreference } from '../lib/auth/authStore';
 import {
   Check,
   Plus,
-  BookOpen,
-  Clock,
   Trash2,
   X,
-  Search,
-  Dumbbell,
   Disc,
   Trophy,
   ArrowLeftRight,
   MoreVertical,
 } from 'lucide-react';
+import {
+  DumbbellHorizontalIcon,
+  RestClockIcon,
+  OpenBookIcon,
+} from './HomeIcons';
 import styles from './ActiveWorkout.module.css';
 
 interface ActiveWorkoutProps {
@@ -218,6 +219,7 @@ export const ActiveWorkout: React.FC<ActiveWorkoutProps> = ({
 
   // 10. Safe Discard Confirmation Dialog State
   const [isDiscardConfirmOpen, setIsDiscardConfirmOpen] = useState<boolean>(false);
+  const [isDiscarding, setIsDiscarding] = useState<boolean>(false);
 
   // 11. Active Exercise Overflow Dropdown Menu State
   const [activeMenuExerciseId, setActiveMenuExerciseId] = useState<string | null>(null);
@@ -314,9 +316,19 @@ export const ActiveWorkout: React.FC<ActiveWorkoutProps> = ({
   };
 
   const handleConfirmDiscard = async () => {
-    await abandonWorkoutSession(session.id);
-    setIsDiscardConfirmOpen(false);
-    onFinishWorkout();
+    if (isDiscarding) return;
+    try {
+      setIsDiscarding(true);
+      await abandonWorkoutSession(session.id);
+      setIsDiscardConfirmOpen(false);
+      onFinishWorkout();
+    } catch (err) {
+      console.error('Failed to discard workout:', err);
+      setIsDiscardConfirmOpen(false);
+      onFinishWorkout();
+    } finally {
+      setIsDiscarding(false);
+    }
   };
 
   // Filtered exercises for picker
@@ -336,12 +348,14 @@ export const ActiveWorkout: React.FC<ActiveWorkoutProps> = ({
       {/* Sticky Top Bar */}
       <div className={styles.topBar}>
         <div className={styles.workoutMeta}>
-          <div className={styles.workoutTitle}>
-            <Dumbbell size={20} color="var(--accent-primary)" />
-            <span>{session.title}</span>
+          <div className={styles.titleRow}>
+            <div className={styles.logoBadge}>
+              <DumbbellHorizontalIcon size={14} color="#ffffff" strokeWidth={2.4} />
+            </div>
+            <h1 className={styles.workoutTitle}>{session.title}</h1>
           </div>
           <div className={styles.durationBadge}>
-            <Clock size={13} />
+            <RestClockIcon size={12} strokeWidth={2.2} color="var(--accent-primary, #a78bfa)" />
             <span>{formatElapsed(elapsedSec)}</span>
           </div>
         </div>
@@ -351,9 +365,10 @@ export const ActiveWorkout: React.FC<ActiveWorkoutProps> = ({
             type="button"
             className={styles.cancelBtn}
             onClick={() => setIsDiscardConfirmOpen(true)}
-            title="Discard Workout Session"
+            aria-label="Discard workout"
+            title="Discard workout"
           >
-            <Trash2 size={18} />
+            <Trash2 size={16} />
           </button>
           <button
             type="button"
@@ -368,21 +383,13 @@ export const ActiveWorkout: React.FC<ActiveWorkoutProps> = ({
 
       {/* Exercises List */}
       {exerciseIdsInWorkout.length === 0 ? (
-        <div
-          style={{
-            textAlign: 'center',
-            padding: '50px 20px',
-            color: 'var(--text-secondary)',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            gap: '12px',
-          }}
-        >
-          <Dumbbell size={48} color="var(--border-strong)" />
-          <h3 style={{ color: 'var(--text-primary)', fontSize: 'var(--font-lg)' }}>Workout is Empty</h3>
-          <p style={{ fontSize: 'var(--font-sm)', color: 'var(--text-muted)' }}>
-            Add your first exercise below to begin logging sets with instant numerical entries.
+        <div className={styles.emptyCard}>
+          <div className={styles.emptyIconBadge}>
+            <DumbbellHorizontalIcon size={32} color="var(--accent-primary, #a78bfa)" strokeWidth={2} />
+          </div>
+          <h3 className={styles.emptyTitle}>No exercises yet</h3>
+          <p className={styles.emptySubtitle}>
+            Tap &ldquo;Add exercise&rdquo; below to start your training session.
           </p>
         </div>
       ) : (
@@ -411,7 +418,7 @@ export const ActiveWorkout: React.FC<ActiveWorkoutProps> = ({
                       onClick={() => setModalExercise(exercise)}
                       title="View setup cues and common mistakes"
                     >
-                      <BookOpen size={13} />
+                      <OpenBookIcon size={13} strokeWidth={2.2} color="var(--accent-primary, #a78bfa)" />
                       <span>Cues</span>
                     </button>
                   )}
@@ -439,7 +446,7 @@ export const ActiveWorkout: React.FC<ActiveWorkoutProps> = ({
                         }}
                       >
                         <ArrowLeftRight size={14} color="var(--accent-primary)" />
-                        <span>Swap (Equipment Busy)</span>
+                        <span>Swap exercise</span>
                       </button>
 
                       {exercise?.category === 'barbell' && (
@@ -487,7 +494,7 @@ export const ActiveWorkout: React.FC<ActiveWorkoutProps> = ({
                         }}
                       >
                         <Trophy size={14} color="var(--accent-amber)" />
-                        <span>1RM & Strength Zones</span>
+                        <span>1RM & Strength</span>
                       </button>
 
                       <button
@@ -569,7 +576,7 @@ export const ActiveWorkout: React.FC<ActiveWorkoutProps> = ({
           <div className={styles.pickerDrawer} onClick={(e) => e.stopPropagation()}>
             <div className={styles.pickerHeader}>
               <div className={styles.pickerTop}>
-                <h3>Select Exercise</h3>
+                <h3>Pick an exercise</h3>
                 <button
                   type="button"
                   className={styles.cancelBtn}
@@ -639,17 +646,25 @@ export const ActiveWorkout: React.FC<ActiveWorkoutProps> = ({
 
       {/* Safe Discard Confirmation Dialog */}
       {isDiscardConfirmOpen && (
-        <div className={styles.confirmOverlay} onClick={() => setIsDiscardConfirmOpen(false)}>
+        <div
+          className={styles.confirmOverlay}
+          onClick={(e) => {
+            if (e.target === e.currentTarget) {
+              setIsDiscardConfirmOpen(false);
+            }
+          }}
+        >
           <div className={styles.confirmCard} onClick={(e) => e.stopPropagation()}>
-            <div className={styles.confirmTitle}>Discard Workout?</div>
+            <div className={styles.confirmTitle}>Delete this workout?</div>
             <div className={styles.confirmDesc}>
-              Are you sure you want to discard this workout? All sets and progress logged during this session will be discarded.
+              All logged sets will be deleted.
             </div>
             <div className={styles.confirmActions}>
               <button
                 type="button"
                 className={styles.confirmKeepBtn}
                 onClick={() => setIsDiscardConfirmOpen(false)}
+                disabled={isDiscarding}
               >
                 Keep Workout
               </button>
@@ -657,8 +672,9 @@ export const ActiveWorkout: React.FC<ActiveWorkoutProps> = ({
                 type="button"
                 className={styles.confirmDiscardBtn}
                 onClick={handleConfirmDiscard}
+                disabled={isDiscarding}
               >
-                Discard
+                {isDiscarding ? 'Discarding...' : 'Discard'}
               </button>
             </div>
           </div>
