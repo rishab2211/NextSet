@@ -34,10 +34,10 @@ export const ExerciseSwapModal: React.FC<ExerciseSwapModalProps> = ({
           <div className={styles.titleArea}>
             <div className={styles.title}>
               <ArrowLeftRight size={20} color="var(--accent-amber)" />
-              <span>Equipment Busy? Swap Exercise</span>
+              <span>Swap exercise</span>
             </div>
             <div className={styles.currentBadge}>
-              Swapping out: <span className={styles.currentName}>{currentExercise?.name || currentExerciseId}</span>
+              Replacing <span className={styles.currentName}>{currentExercise?.name || currentExerciseId}</span>
             </div>
           </div>
           <button type="button" className={styles.closeBtn} onClick={onClose}>
@@ -46,7 +46,7 @@ export const ExerciseSwapModal: React.FC<ExerciseSwapModalProps> = ({
         </div>
 
         <div className={styles.infoBanner}>
-          Select an alternative movement with identical primary muscle activation. All your currently logged sets will be preserved.
+          Logged sets will be kept.
         </div>
 
         <div className={styles.list}>
@@ -83,7 +83,7 @@ export const ExerciseSwapModal: React.FC<ExerciseSwapModalProps> = ({
                     onClick={() => onViewGuide(exercise)}
                   >
                     <BookOpen size={13} />
-                    <span>View Form Cues</span>
+                    <span>View cues</span>
                   </button>
                 )}
 
@@ -96,7 +96,7 @@ export const ExerciseSwapModal: React.FC<ExerciseSwapModalProps> = ({
                   }}
                 >
                   <Check size={14} />
-                  <span>Swap to This</span>
+                  <span>Switch</span>
                 </button>
               </div>
             </div>

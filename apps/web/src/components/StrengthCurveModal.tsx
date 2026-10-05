@@ -39,7 +39,7 @@ export const StrengthCurveModal: React.FC<StrengthCurveModalProps> = ({
           <div className={styles.titleArea}>
             <div className={styles.title}>
               <Trophy size={20} color="var(--accent-amber)" />
-              <span>1RM & Strength Zones</span>
+              <span>Estimated 1RM</span>
             </div>
             <div className={styles.subtitle}>{exerciseName}</div>
           </div>
@@ -50,19 +50,19 @@ export const StrengthCurveModal: React.FC<StrengthCurveModalProps> = ({
 
         {/* Hero Estimated 1RM Banner */}
         <div className={styles.heroBanner}>
-          <div className={styles.heroLabel}>Estimated One-Rep Max</div>
+          <div className={styles.heroLabel}>Estimated 1RM</div>
           <div className={styles.heroValue}>
             <span>{breakdown.estimated1RM}</span>
             <span className={styles.heroUnit}>{unit}</span>
           </div>
           <div className={styles.heroBasis}>
-            Calculated from baseline of {validWeight} {unit} × {validReps} reps
+            Based on {validWeight} {unit} × {validReps} reps
           </div>
         </div>
 
         {/* Scientific Warmup Tip */}
         <div className={styles.warmupTip}>
-          <strong>Hypertrophy Tip:</strong> Tap any row below to load that working weight directly into your current set. For strength sets (85%+), perform 2 progressive warmup ramps first.
+          Tap any row to use that weight in your set.
         </div>
 
         {/* Percentage Breakdown Table */}
@@ -71,7 +71,7 @@ export const StrengthCurveModal: React.FC<StrengthCurveModalProps> = ({
             <span>% 1RM</span>
             <span>Weight</span>
             <span>Target</span>
-            <span>Adaptation Focus</span>
+            <span>Goal</span>
           </div>
 
           {breakdown.percentages.map((row) => (

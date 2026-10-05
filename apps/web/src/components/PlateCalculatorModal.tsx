@@ -66,10 +66,10 @@ export const PlateCalculatorModal: React.FC<PlateCalculatorModalProps> = ({
           <div className={styles.titleArea}>
             <div className={styles.title}>
               <Disc size={20} color="var(--accent-primary)" />
-              <span>Barbell Plate Calculator</span>
+              <span>Plate Calculator</span>
             </div>
             <div className={styles.subtitle}>
-              Per-side loading breakdown for Olympic barbells
+              Plates on each side
             </div>
           </div>
           <button type="button" className={styles.closeBtn} onClick={onClose}>
@@ -172,7 +172,7 @@ export const PlateCalculatorModal: React.FC<PlateCalculatorModalProps> = ({
 
           {result.unmatchedWeight > 0 && (
             <div style={{ fontSize: '11px', color: 'var(--accent-amber)', marginTop: 2 }}>
-              Note: {result.unmatchedWeight} {unit} remainder cannot be loaded with standard plate increments.
+              {result.unmatchedWeight} {unit} can&apos;t be made with standard plates.
             </div>
           )}
         </div>
@@ -186,7 +186,7 @@ export const PlateCalculatorModal: React.FC<PlateCalculatorModalProps> = ({
             onClick={handleApply}
           >
             <Check size={18} />
-            <span>Apply {weight} {unit} to Set</span>
+            <span>Use {weight} {unit}</span>
           </button>
         )}
       </div>

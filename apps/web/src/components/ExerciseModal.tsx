@@ -3,7 +3,8 @@
 import React, { useState } from 'react';
 import type { ExerciseGuide } from '@nextset/shared';
 import { MuscleMap } from './MuscleMap';
-import { X, AlertTriangle, Check, Dumbbell, ChevronDown, ChevronUp } from 'lucide-react';
+import { X, AlertTriangle, Check, ChevronDown, ChevronUp } from 'lucide-react';
+import { DumbbellHorizontalIcon } from './HomeIcons';
 import styles from './ExerciseModal.module.css';
 
 interface ExerciseModalProps {
@@ -61,8 +62,8 @@ export const ExerciseModal: React.FC<ExerciseModalProps> = ({
           {/* Setup Instructions */}
           <div className={styles.anatomySection}>
             <div className={styles.sectionHeading}>
-              <Dumbbell size={16} color="var(--accent-primary)" />
-              <span>Setup Checklist</span>
+              <DumbbellHorizontalIcon size={16} color="var(--accent-primary)" />
+              <span>Setup</span>
             </div>
             <ol className={styles.stepList}>
               {exercise.setupSteps.map((step, idx) => (
@@ -78,7 +79,7 @@ export const ExerciseModal: React.FC<ExerciseModalProps> = ({
           <div className={styles.anatomySection}>
             <div className={styles.sectionHeading}>
               <Check size={16} color="var(--success)" />
-              <span>Execution Cues</span>
+              <span>Form & technique</span>
             </div>
             <ol className={styles.stepList}>
               {exercise.executionSteps.map((step, idx) => (
@@ -94,7 +95,7 @@ export const ExerciseModal: React.FC<ExerciseModalProps> = ({
           <div className={styles.anatomySection}>
             <div className={styles.sectionHeading}>
               <AlertTriangle size={16} color="var(--danger)" />
-              <span>Common Mistakes & Fixes</span>
+              <span>Common mistakes</span>
             </div>
             <div className={styles.stepList}>
               {exercise.commonMistakes.map((item, idx) => (
@@ -118,7 +119,7 @@ export const ExerciseModal: React.FC<ExerciseModalProps> = ({
               className={styles.accordionToggle}
               onClick={() => setShowAnatomyMap(!showAnatomyMap)}
             >
-              <span>Target Musculature Diagram</span>
+              <span>Muscles worked</span>
               {showAnatomyMap ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
             </button>
 
@@ -145,8 +146,8 @@ export const ExerciseModal: React.FC<ExerciseModalProps> = ({
                 onClose();
               }}
             >
-              <Dumbbell size={18} />
-              {inActiveWorkout ? 'Add to Current Workout' : 'Start Workout with this Exercise'}
+              <DumbbellHorizontalIcon size={18} strokeWidth={2.2} />
+              {inActiveWorkout ? 'Add to workout' : 'Start with this exercise'}
             </button>
           </div>
         )}
