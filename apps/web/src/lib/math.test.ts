@@ -96,9 +96,9 @@ test('strengthMath: checkPersonalRecord identifies new PR', () => {
   assert.strictEqual(res.is1RMPR, true);
 });
 
-test('themeStore: ACCENT_PRESETS contains valid hex codes and 6 presets', async () => {
+test('themeStore: ACCENT_PRESETS contains valid hex codes and 12 presets', async () => {
   const { ACCENT_PRESETS } = await import('./themeStore.ts');
-  assert.strictEqual(ACCENT_PRESETS.length, 6);
+  assert.strictEqual(ACCENT_PRESETS.length, 12);
   for (const preset of ACCENT_PRESETS) {
     assert.match(preset.hex, /^#[0-9a-fA-F]{6}$/);
     assert.ok(preset.name.length > 0);
