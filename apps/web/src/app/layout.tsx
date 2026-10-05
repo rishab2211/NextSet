@@ -5,7 +5,7 @@ import '../styles/globals.css';
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'https://nextset-4u3.pages.dev'),
-  title: 'NextSet — High Performance Strength & Hypertrophy PWA',
+  title: 'NextSet - Always by your side at the rack.',
   description: 'Mobile-first, offline-first gym tracking designed for high-stress gym environments with real-time anatomy cues and instant numeric logging.',
   manifest: '/manifest.json',
   icons: {
@@ -63,12 +63,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="mobile-web-app-capable" content="yes" />
       </head>
-      <body>
+      <body suppressHydrationWarning>
         <main className="app-viewport">
           <ServiceWorkerRegister />
           {children}
