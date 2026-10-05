@@ -69,7 +69,7 @@ export const WorkoutHistory: React.FC = () => {
 
   return (
     <div className={styles.container}>
-      <h1 className={styles.title}>Workout Log & History</h1>
+      <h1 className={styles.title}>History</h1>
 
       {completedSessions.length === 0 ? (
         <div
@@ -84,9 +84,9 @@ export const WorkoutHistory: React.FC = () => {
           }}
         >
           <Award size={48} color="var(--border-strong)" />
-          <h3 style={{ color: 'var(--text-primary)', fontSize: 'var(--font-lg)' }}>No Completed Workouts Yet</h3>
+          <h3 style={{ color: 'var(--text-primary)', fontSize: 'var(--font-lg)' }}>No workouts yet</h3>
           <p style={{ fontSize: 'var(--font-sm)', color: 'var(--text-muted)' }}>
-            Start a workout session from the main screen to log your sets and build your training log.
+            Workouts you finish will show up here.
           </p>
         </div>
       ) : (

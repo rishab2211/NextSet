@@ -1,32 +1,38 @@
 .container {
   display: flex;
   flex-direction: column;
-  padding: var(--space-4) var(--space-4) 90px;
-  gap: var(--space-4);
+  min-height: 100vh;
+  background: 
+    radial-gradient(circle at 50% -20px, var(--accent-primary-subtle, rgba(139, 92, 246, 0.14)) 0%, transparent 65%),
+    var(--bg-primary);
+  padding: 14px 16px calc(76px + env(safe-area-inset-bottom, 0px));
+  gap: 12px;
 }
 
 .title {
-  font-size: var(--font-xl);
+  font-size: 19px;
   font-weight: 700;
   color: var(--text-primary);
-  letter-spacing: -0.01em;
+  letter-spacing: -0.02em;
 }
 
 .historyList {
   display: flex;
   flex-direction: column;
-  gap: var(--space-3);
+  gap: 10px;
 }
 
 .card {
-  background: var(--bg-secondary);
+  background: var(--bg-surface-glass, var(--bg-secondary));
   border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-md);
-  padding: var(--space-4);
+  border-radius: 16px;
+  padding: 14px;
   display: flex;
   flex-direction: column;
-  gap: var(--space-3);
+  gap: 10px;
   box-shadow: var(--shadow-sm);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
 .cardHeader {
@@ -36,15 +42,15 @@
 }
 
 .workoutTitle {
-  font-size: var(--font-base);
+  font-size: var(--font-sm);
   font-weight: 700;
   color: var(--text-primary);
 }
 
 .dateBadge {
-  font-size: var(--font-xs);
+  font-size: 11px;
   color: var(--text-muted);
-  margin-top: 2px;
+  margin-top: 1px;
 }
 
 .durationPill {
@@ -53,9 +59,9 @@
   gap: 4px;
   background: var(--bg-tertiary);
   border: 1px solid var(--border-subtle);
-  padding: 4px 8px;
-  border-radius: var(--radius-sm);
-  font-size: var(--font-xs);
+  padding: 3px 6px;
+  border-radius: var(--radius-xs);
+  font-size: 11px;
   color: var(--text-secondary);
   font-family: var(--font-mono);
 }
@@ -63,8 +69,8 @@
 .exerciseTagsList {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  padding-top: var(--space-2);
+  gap: 5px;
+  padding-top: 6px;
   border-top: 1px solid var(--border-subtle);
 }
 
@@ -72,7 +78,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  font-size: var(--font-xs);
+  font-size: 11px;
 }
 
 .exerciseNameText {

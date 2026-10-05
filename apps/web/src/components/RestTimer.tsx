@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Timer, X } from 'lucide-react';
+import { X } from 'lucide-react';
+import { RestClockIcon } from './HomeIcons';
 import { soundFx } from '../lib/audio';
 import { getWorkoutPreferences } from '../lib/themeStore';
 import styles from './RestTimer.module.css';
@@ -79,7 +80,7 @@ export const RestTimer: React.FC<RestTimerProps> = ({
     <div className={styles.dock}>
       <div className={styles.topRow}>
         <div className={styles.titleArea}>
-          <Timer size={18} color="var(--accent-cyan)" />
+          <RestClockIcon size={16} strokeWidth={2.4} color="var(--accent-primary, #a78bfa)" />
           <div className={styles.timerLabel}>Resting</div>
         </div>
 

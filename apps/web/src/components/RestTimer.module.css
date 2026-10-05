@@ -1,19 +1,21 @@
 .dock {
   position: fixed;
-  bottom: calc(var(--space-4) + env(safe-area-inset-bottom, 12px));
+  bottom: calc(12px + env(safe-area-inset-bottom, 12px));
   left: 50%;
   transform: translateX(-50%);
-  width: calc(100% - 32px);
+  width: calc(100% - 24px);
   max-width: 440px;
-  background: var(--bg-elevated);
-  border: 1px solid var(--border-medium);
-  border-radius: var(--radius-lg);
-  padding: var(--space-3) var(--space-4);
-  box-shadow: var(--shadow-lg);
+  background: var(--bg-surface-glass, rgba(18, 21, 35, 0.94));
+  border: 1px solid var(--border-accent, rgba(139, 92, 246, 0.35));
+  border-radius: 16px;
+  padding: 10px 14px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6), 0 0 20px var(--accent-primary-subtle, rgba(139, 92, 246, 0.2));
   z-index: var(--z-dock);
   display: flex;
   flex-direction: column;
-  gap: var(--space-2);
+  gap: 8px;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   animation: slideUp 180ms ease-out;
 }
 
@@ -31,79 +33,83 @@
 .titleArea {
   display: flex;
   align-items: center;
-  gap: var(--space-2);
+  gap: 6px;
 }
 
 .timerLabel {
-  font-size: var(--font-xs);
+  font-size: 10.5px;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: var(--text-secondary);
+  color: var(--accent-primary, #a78bfa);
   font-weight: 700;
 }
 
 .countdownDisplay {
   font-family: var(--font-mono);
-  font-size: var(--font-2xl);
+  font-size: 19px;
   font-weight: 800;
-  color: var(--accent-primary);
+  color: #ffffff;
   line-height: 1;
 }
 
 .actions {
   display: flex;
   align-items: center;
-  gap: var(--space-2);
+  gap: 6px;
 }
 
 .adjustBtn {
-  height: 32px;
+  height: 28px;
   padding: 0 10px;
-  background: var(--bg-tertiary);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-sm);
-  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  color: #ffffff;
   font-family: var(--font-mono);
-  font-size: var(--font-xs);
+  font-size: 11.5px;
   font-weight: 700;
-  transition: all var(--transition-fast);
+  cursor: pointer;
+  transition: all 0.15s ease;
 }
 
 .adjustBtn:active {
-  background: var(--bg-secondary);
+  background: var(--accent-primary-subtle, rgba(139, 92, 246, 0.2));
+  border-color: var(--border-accent, rgba(139, 92, 246, 0.4));
   transform: scale(0.95);
 }
 
 .skipBtn {
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--bg-tertiary);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-sm);
-  color: var(--text-secondary);
-  transition: all var(--transition-fast);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  color: #94a3b8;
+  cursor: pointer;
+  transition: all 0.15s ease;
 }
 
 .skipBtn:active {
-  background: var(--bg-secondary);
-  color: var(--text-primary);
+  background: rgba(248, 113, 113, 0.15);
+  border-color: rgba(248, 113, 113, 0.3);
+  color: #f87171;
   transform: scale(0.95);
 }
 
 .progressBar {
   width: 100%;
-  height: 4px;
-  background: var(--bg-tertiary);
-  border-radius: var(--radius-full);
+  height: 3px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
   overflow: hidden;
 }
 
 .progressFill {
   height: 100%;
-  background: var(--accent-primary);
-  border-radius: var(--radius-full);
-  transition: width 400ms linear;
+  background: var(--accent-primary, #8b5cf6);
+  border-radius: 999px;
+  transition: width 1s linear;
 }

@@ -115,7 +115,7 @@ export const Numpad: React.FC<NumpadProps> = ({
                 onOpenPlateCalculator(val);
               }}
             >
-              Plates 🏋️
+              Plates
             </button>
           )}
 

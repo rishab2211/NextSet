@@ -24,12 +24,12 @@
   background: var(--bg-secondary);
   border-top: 1px solid var(--border-medium);
   border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-  padding: var(--space-4) var(--space-4) calc(var(--space-4) + env(safe-area-inset-bottom, 12px));
+  padding: 10px 14px calc(10px + env(safe-area-inset-bottom, 12px));
   box-shadow: var(--shadow-lg);
   animation: slideUp 180ms cubic-bezier(0.16, 1, 0.3, 1);
   display: flex;
   flex-direction: column;
-  gap: var(--space-3);
+  gap: 8px;
 }
 
 @keyframes slideUp {
@@ -41,29 +41,29 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 var(--space-1);
+  padding: 0 2px;
 }
 
 .label {
-  font-size: var(--font-xs);
+  font-size: 11px;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.05em;
   color: var(--text-secondary);
   font-weight: 700;
 }
 
 .displayValue {
-  font-size: var(--font-3xl);
+  font-size: 1.85rem;
   font-weight: 800;
   color: var(--text-primary);
   font-family: var(--font-mono);
   display: flex;
   align-items: baseline;
-  gap: 6px;
+  gap: 4px;
 }
 
 .unit {
-  font-size: var(--font-sm);
+  font-size: var(--font-xs);
   color: var(--accent-primary);
   font-weight: 700;
   text-transform: uppercase;
@@ -72,21 +72,21 @@
 /* Quick Increments Bar */
 .quickBar {
   display: flex;
-  gap: var(--space-2);
+  gap: 6px;
   overflow-x: auto;
   padding-bottom: 2px;
 }
 
 .quickBtn {
   flex: 1;
-  min-height: 40px;
+  min-height: 34px;
   background: var(--bg-tertiary);
   border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-xs);
   color: var(--text-primary);
   font-family: var(--font-mono);
   font-weight: 700;
-  font-size: var(--font-sm);
+  font-size: 11px;
   transition: all var(--transition-fast);
 }
 
@@ -100,16 +100,16 @@
 .keypadGrid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: var(--space-2);
+  gap: 6px;
 }
 
 .keyBtn {
-  min-height: var(--numpad-key-height);
+  min-height: 46px;
   background: var(--bg-tertiary);
   border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-sm);
   color: var(--text-primary);
-  font-size: var(--font-2xl);
+  font-size: 1.25rem;
   font-weight: 700;
   font-family: var(--font-mono);
   display: flex;
@@ -127,18 +127,17 @@
 
 .actionBtn {
   color: var(--text-secondary);
-  font-size: var(--font-base);
+  font-size: var(--font-sm);
 }
 
 .confirmBtn {
   background: var(--accent-primary);
-  color: #ffffff;
+  color: var(--text-accent-contrast, #0f172a);
   font-weight: 700;
   border: none;
-  font-size: var(--font-base);
+  font-size: var(--font-sm);
 }
 
 .confirmBtn:active {
   background: var(--accent-primary-hover);
-  transform: scale(0.97);
 }
