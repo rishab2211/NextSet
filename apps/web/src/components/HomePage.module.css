@@ -1,0 +1,793 @@
+.container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: #0b0d18;
+  padding-bottom: calc(76px + env(safe-area-inset-bottom, 0px));
+  gap: 14px;
+  overflow-x: hidden;
+}
+
+/* Hero Background Layer using /bg-home.jpg */
+.heroBackgroundLayer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 250px;
+  background-image: url('/bg-home.jpg');
+  background-size: cover;
+  background-position: 70% 50%;
+  background-repeat: no-repeat;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.heroBackgroundOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 380px;
+  background: 
+    linear-gradient(90deg, #0b0d18 0%, rgba(11, 13, 24, 0.94) 36%, rgba(11, 13, 24, 0.65) 58%, rgba(11, 13, 24, 0.04) 84%, rgba(11, 13, 24, 0.35) 100%),
+    linear-gradient(180deg, rgba(11, 13, 24, 0.45) 0%, rgba(11, 13, 24, 0.1) 40%, rgba(11, 13, 24, 0.85) 85%, #0b0d18 100%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Ensure foreground content sits above hero background */
+.topBar,
+.activeBanner,
+.heroContent,
+.howItWorksCard,
+.startWorkoutCtaBtn,
+.getStartedCard,
+.quickStartSection {
+  position: relative;
+  z-index: 2;
+}
+
+/* Top Navigation Bar */
+.topBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px 4px;
+}
+
+.logoArea {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.logoIcon {
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
+  background: var(--accent-primary, #8b5cf6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 10px var(--accent-primary-subtle, rgba(139, 92, 246, 0.45));
+  transition: all 0.2s ease;
+}
+
+.logoText {
+  display: inline-flex;
+  align-items: baseline;
+  font-size: 19px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.logoNext {
+  color: #ffffff;
+}
+
+.logoSet {
+  color: var(--accent-primary, #a78bfa);
+  transition: color 0.2s ease;
+}
+
+.statusArea {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.authBadgeBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #f1f5f9;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 5px 10px;
+  border-radius: 999px;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  max-width: 145px;
+  transition: all 0.15s ease;
+}
+
+.authBadgeBtn:hover, .authBadgeBtn:active {
+  background: rgba(255, 255, 255, 0.14);
+  border-color: rgba(255, 255, 255, 0.22);
+}
+
+.userNameText {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.syncBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11.5px;
+  font-weight: 600;
+  padding: 5px 10px;
+  border-radius: 999px;
+}
+
+.syncBadgeOnline {
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  color: #10b981;
+}
+
+.syncBadgeOffline {
+  background: rgba(245, 158, 11, 0.15);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  color: #f59e0b;
+}
+
+/* Active Workout Banner */
+.activeBanner {
+  margin: 0 16px;
+  background: var(--accent-primary-subtle, rgba(139, 92, 246, 0.15));
+  border: 1px solid var(--border-accent, rgba(139, 92, 246, 0.4));
+  border-radius: 14px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.bannerTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.bannerTitle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+  font-size: 13px;
+  color: #ffffff;
+}
+
+.bannerActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.bannerResumeBtn {
+  flex: 1;
+  height: 38px;
+  font-size: 13px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: var(--accent-primary, #8b5cf6);
+  color: var(--text-accent-contrast, #ffffff);
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 14px var(--accent-primary-subtle, rgba(139, 92, 246, 0.35));
+  transition: all 0.15s ease;
+}
+
+.bannerDiscardBtn {
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(248, 113, 113, 0.15);
+  border: 1px solid rgba(248, 113, 113, 0.3);
+  color: #f87171;
+  border-radius: 10px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+/* Hero Content */
+.heroContent {
+  padding: 18px 16px 30px;
+  display: flex;
+  flex-direction: column;
+}
+
+.heroHeading {
+  font-size: 26px;
+  font-weight: 800;
+  line-height: 1.18;
+  color: #ffffff;
+  letter-spacing: -0.025em;
+}
+
+.heroHeadingHighlight {
+  color: var(--accent-primary, #a78bfa);
+}
+
+.heroSubtext {
+  font-size: 13px;
+  color: #94a3b8;
+  line-height: 1.45;
+  margin-top: 8px;
+  font-weight: 400;
+}
+
+.heroCursive {
+  font-family: 'Caveat', cursive, sans-serif;
+  font-size: 21px;
+  color: var(--accent-primary, #c084fc);
+  font-weight: 600;
+  font-style: italic;
+  margin-top: 10px;
+  letter-spacing: 0.02em;
+}
+
+/* Card 1: How it works */
+.howItWorksCard {
+  margin: 0 16px;
+  background: rgba(18, 21, 35, 0.88);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 18px;
+  padding: 16px 14px 14px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.cardTitle {
+  font-size: 15px;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: -0.01em;
+}
+
+.stepBadge {
+  background: var(--accent-primary-subtle, rgba(167, 139, 250, 0.15));
+  color: var(--accent-primary, #c084fc);
+  font-size: 10.5px;
+  font-weight: 600;
+  padding: 3px 9px;
+  border-radius: 999px;
+}
+
+.stepsRow {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 3px;
+}
+
+.stepCol {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.stepIconWrap {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.stepArrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 36px;
+  flex-shrink: 0;
+  padding: 0 1px;
+}
+
+.stepTitle {
+  font-size: 10.5px;
+  font-weight: 700;
+  color: #ffffff;
+  margin-top: 8px;
+  line-height: 1.25;
+}
+
+.stepDesc {
+  font-size: 9px;
+  color: #94a3b8;
+  line-height: 1.3;
+  margin-top: 3px;
+}
+
+/* Primary CTA Button */
+.startWorkoutCtaBtn {
+  margin: 0 16px;
+  height: 48px;
+  background: var(--accent-primary, #8b5cf6);
+  color: var(--text-accent-contrast, #ffffff);
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 18px;
+  font-size: 14.5px;
+  font-weight: 700;
+  box-shadow: 0 4px 18px var(--accent-primary-subtle, rgba(139, 92, 246, 0.4));
+  cursor: pointer;
+  transition: all 0.15s ease;
+  border: none;
+}
+
+.startWorkoutCtaBtn:hover, .startWorkoutCtaBtn:active {
+  filter: brightness(1.1);
+  transform: scale(0.99);
+}
+
+.startWorkoutCtaCenter {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 auto;
+  transform: translateX(6px);
+}
+
+/* Card 2: Get started in seconds */
+.getStartedCard {
+  margin: 0 16px;
+  background: rgba(18, 21, 35, 0.88);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 18px;
+  padding: 16px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.getStartedHeader {
+  display: flex;
+  flex-direction: column;
+}
+
+.getStartedTitle {
+  font-size: 15px;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: -0.01em;
+}
+
+.getStartedSubtitle {
+  font-size: 11.5px;
+  color: #94a3b8;
+  margin-top: 3px;
+}
+
+.actionCardsGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.actionCard {
+  border-radius: 14px;
+  padding: 14px 12px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 114px;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.15s ease;
+  border: none;
+  text-align: left;
+}
+
+.actionCard:hover, .actionCard:active {
+  transform: translateY(-1px);
+}
+
+.actionCardPurple {
+  background: linear-gradient(135deg, var(--accent-primary-subtle, rgba(139, 92, 246, 0.14)) 0%, transparent 100%);
+  border: 1px solid var(--border-accent, rgba(139, 92, 246, 0.25));
+}
+
+.actionCardBlue {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.14) 0%, rgba(59, 130, 246, 0.04) 100%);
+  border: 1px solid rgba(59, 130, 246, 0.25);
+}
+
+.actionCardIconWrap {
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.actionCardBody {
+  margin-top: 10px;
+}
+
+.actionCardTitle {
+  font-size: 13px;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.actionCardDesc {
+  font-size: 10.5px;
+  color: #94a3b8;
+  line-height: 1.3;
+  margin-top: 2px;
+}
+
+.actionCardArrow {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+}
+
+.addToHomeScreenBanner {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 12px;
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.addToHomeLeft {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.addToHomeIconWrap {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: var(--accent-primary-subtle, rgba(167, 139, 250, 0.15));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.addToHomeTexts {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.addToHomeTitle {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.addToHomeDesc {
+  font-size: 10.5px;
+  color: #94a3b8;
+  margin-top: 1px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.installPillBtn {
+  background: var(--accent-primary-subtle, rgba(139, 92, 246, 0.1));
+  border: 1px solid var(--accent-primary, #8b5cf6);
+  color: var(--accent-primary, #c084fc);
+  font-size: 11.5px;
+  font-weight: 600;
+  padding: 5px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 0.15s ease;
+}
+
+.installPillBtn:hover, .installPillBtn:active {
+  background: var(--accent-primary-subtle, rgba(139, 92, 246, 0.22));
+  color: #ffffff;
+}
+
+/* Section 3: Quick start */
+.quickStartSection {
+  margin: 0 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.quickStartHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.quickStartTitle {
+  font-size: 15px;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: -0.01em;
+}
+
+.seeAllBtn {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--accent-primary, #a78bfa);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  background: none;
+  border: none;
+  padding: 0;
+  transition: color 0.15s ease;
+}
+
+.seeAllBtn:hover {
+  color: var(--accent-primary-hover, #c084fc);
+}
+
+.routinesGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 9px;
+}
+
+.routineCard {
+  background: rgba(18, 21, 35, 0.88);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  padding: 12px 10px;
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+  min-height: 108px;
+  justify-content: space-between;
+  transition: all 0.15s ease;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  text-align: left;
+}
+
+.routineCard:hover, .routineCard:active {
+  border-color: rgba(255, 255, 255, 0.18);
+  transform: translateY(-1px);
+}
+
+.routineCardTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.routineIconWrap {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.routineCardBottom {
+  margin-top: 10px;
+}
+
+.routineName {
+  font-size: 12px;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.routineDesc {
+  font-size: 9.5px;
+  color: #94a3b8;
+  line-height: 1.35;
+  margin-top: 3px;
+}
+
+/* Confirmation Dialog Overlay */
+.confirmOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 16px;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+.confirmCard {
+  background: #191c2b;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 16px;
+  padding: 20px;
+  width: 100%;
+  max-width: 320px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.confirmTitle {
+  font-size: 16px;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.confirmDesc {
+  font-size: 13px;
+  color: #94a3b8;
+  line-height: 1.4;
+}
+
+.confirmActions {
+  display: flex;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.confirmKeepBtn {
+  flex: 1;
+  height: 38px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.confirmDiscardBtn {
+  flex: 1;
+  height: 38px;
+  border-radius: 10px;
+  background: #ef4444;
+  border: none;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* Install Guide Modal */
+.guideModalCard {
+  background: #191c2b;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 18px;
+  padding: 20px;
+  width: 100%;
+  max-width: 360px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.guideModalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.guideModalTitle {
+  font-size: 16px;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.guideModalCloseBtn {
+  color: #94a3b8;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+}
+
+.platformTabs {
+  display: flex;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+  padding: 3px;
+  gap: 4px;
+}
+
+.platformTabBtn {
+  flex: 1;
+  height: 32px;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  color: #94a3b8;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.platformTabBtnActive {
+  background: var(--accent-primary, #8b5cf6);
+  color: var(--text-accent-contrast, #ffffff);
+}
+
+.modalStepRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.modalStepNum {
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  background: var(--accent-primary-subtle, rgba(139, 92, 246, 0.2));
+  color: var(--accent-primary, #c084fc);
+  font-size: 11px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.modalStepTexts {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.modalStepTitle {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.modalStepDesc {
+  font-size: 11px;
+  color: #94a3b8;
+  line-height: 1.35;
+}
