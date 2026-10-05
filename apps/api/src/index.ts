@@ -35,6 +35,15 @@ app.use('*', cors({
   allowHeaders: ['Content-Type', 'Authorization', 'X-Client-Id'],
 }));
 
+// Root status endpoint
+app.get('/', (c) => {
+  return c.json({
+    status: 'ok',
+    app: 'nextset-api',
+    health: '/api/health',
+  });
+});
+
 // Health check endpoint
 app.get('/api/health', (c) => {
   return c.json({
@@ -589,7 +598,7 @@ app.post('/api/sync', async (c) => {
     const payload = await c.req.json<SyncPayload>();
     const { sessions = [], sets = [] } = payload;
     const db = c.env.DB;
-    const { userId } = await resolveUserId(c);
+    const { userId, isAuth } = await resolveUserId(c);
 
     if (!db) {
       return c.json({ error: 'Database binding not configured' }, 500);
@@ -599,10 +608,12 @@ app.post('/api/sync', async (c) => {
 
     // 1. TOPOLOGICAL STEP 1: UPSERT Sessions first
     for (const session of sessions) {
-      // Attribute session to the resolved user ID (authenticated or anonymous partition)
-      const effectiveUserId = session.user_id && session.user_id !== 'user_kinetic_local' && session.user_id !== 'user_nextset_local'
-        ? session.user_id
-        : userId;
+      // Attribute session to the resolved user ID (authenticated user ID if logged in, else partition)
+      const effectiveUserId = isAuth
+        ? userId
+        : (session.user_id && session.user_id !== 'user_kinetic_local' && session.user_id !== 'user_nextset_local'
+            ? session.user_id
+            : userId);
 
       statements.push(
         db.prepare(`
