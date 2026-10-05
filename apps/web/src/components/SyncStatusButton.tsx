@@ -8,7 +8,6 @@ import {
   RefreshCw,
   CloudUpload,
   Check,
-  Database,
   X,
   ShieldCheck,
   LogIn,
@@ -194,18 +193,18 @@ export const SyncStatusButton: React.FC<SyncStatusButtonProps> = ({
 
       {/* Popover Drawer */}
       {isPopoverOpen && (
-        <div className={styles.popover} role="dialog" aria-label="Sync & Storage Status">
+        <div className={styles.popover} role="dialog" aria-label="Sync & Backup Status">
           {/* Header */}
           <div className={styles.popoverHeader}>
             <div className={styles.popoverTitleGroup}>
-              <Database size={14} color="var(--accent-primary, #a78bfa)" />
-              <span>Cloud Sync & Storage</span>
+              <CloudUpload size={15} color="var(--accent-primary, #a78bfa)" />
+              <span>Backup & Sync</span>
             </div>
             <button
               type="button"
               className={styles.closeButton}
               onClick={() => setIsPopoverOpen(false)}
-              aria-label="Close sync modal"
+              aria-label="Close sync dialog"
             >
               <X size={14} />
             </button>
@@ -229,7 +228,7 @@ export const SyncStatusButton: React.FC<SyncStatusButtonProps> = ({
                   </>
                 ) : isSyncing ? (
                   <>
-                    <RefreshCw size={10} className={styles.spinIcon} /> Syncing
+                    <RefreshCw size={10} className={styles.spinIcon} /> Syncing...
                   </>
                 ) : pendingCount > 0 ? (
                   <>
@@ -237,7 +236,7 @@ export const SyncStatusButton: React.FC<SyncStatusButtonProps> = ({
                   </>
                 ) : (
                   <>
-                    <Check size={10} /> Cloud Up to Date
+                    <Check size={10} /> Up to Date
                   </>
                 )}
               </span>
@@ -245,39 +244,41 @@ export const SyncStatusButton: React.FC<SyncStatusButtonProps> = ({
 
             <div className={styles.statusDesc}>
               {!isOnline
-                ? 'All sets are safely saved on this device. Changes will auto-sync once connection returns.'
+                ? 'Your workouts are saved safely on this device. We’ll automatically sync them once you’re back online.'
                 : pendingCount > 0
-                ? `${pendingCount} mutation(s) saved locally, ready to push to Cloudflare D1.`
-                : 'Your workout data is backed up to Cloudflare D1 global edge database.'}
+                ? `${pendingCount} update${pendingCount === 1 ? '' : 's'} saved on your device, syncing shortly.`
+                : 'All your workouts and progress are safely backed up.'}
             </div>
           </div>
 
           {/* Details */}
           <div className={styles.detailsGrid}>
             <div className={styles.detailRow}>
-              <span>Network</span>
+              <span>Connection</span>
               <span className={styles.detailValue}>
-                {isOnline ? 'Online (Connected)' : 'Disconnected'}
+                {isOnline ? 'Online' : 'Offline'}
               </span>
             </div>
 
             <div className={styles.detailRow}>
-              <span>Local Queue</span>
+              <span>Pending updates</span>
               <span className={styles.detailValue}>
-                {pendingCount === 0 ? '0 pending mutations' : `${pendingCount} pending`}
+                {pendingCount === 0 ? 'None (all saved)' : `${pendingCount} unsynced`}
               </span>
             </div>
 
             <div className={styles.detailRow}>
-              <span>Last Synced</span>
+              <span>Last synced</span>
               <span className={styles.detailValue}>
                 {formatRelativeTime(lastSyncTime)}
               </span>
             </div>
 
             <div className={styles.detailRow}>
-              <span>Cloud Storage</span>
-              <span className={styles.detailValue}>Cloudflare D1 (Global)</span>
+              <span>Backup</span>
+              <span className={styles.detailValue}>
+                {currentUser ? 'Cloud Backup Active' : 'Saved on this Device'}
+              </span>
             </div>
           </div>
 
@@ -295,9 +296,9 @@ export const SyncStatusButton: React.FC<SyncStatusButtonProps> = ({
             />
             <span>
               {isSyncing
-                ? 'Syncing in progress...'
+                ? 'Syncing...'
                 : !isOnline
-                ? 'Offline - Cannot sync'
+                ? 'Offline · Sync when connected'
                 : 'Sync Now'}
             </span>
           </button>
@@ -306,7 +307,7 @@ export const SyncStatusButton: React.FC<SyncStatusButtonProps> = ({
           {!currentUser && onOpenAuth && (
             <div className={styles.guestPrompt}>
               <div className={styles.guestPromptText}>
-                You are currently in guest mode. Sign in to synchronize workouts across your phone and tablet.
+                You’re in guest mode. Sign in to access your workouts on any device and keep them safely backed up.
               </div>
               <button
                 type="button"
@@ -335,7 +336,7 @@ export const SyncStatusButton: React.FC<SyncStatusButtonProps> = ({
             >
               <ShieldCheck size={13} color="#10b981" />
               <span>
-                Backed up as <strong style={{ color: '#cbd5e1' }}>{currentUser.email}</strong>
+                Backed up to <strong style={{ color: '#cbd5e1' }}>{currentUser.email}</strong>
               </span>
             </div>
           )}

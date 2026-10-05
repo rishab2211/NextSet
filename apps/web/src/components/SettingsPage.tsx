@@ -248,7 +248,7 @@ export const SettingsPage: React.FC = () => {
           <span>Account & Cloud Sync</span>
         </div>
         <p className={styles.sectionDesc}>
-          Workouts are stored locally first in IndexedDB and synced automatically when signed in.
+          Your workouts are saved instantly on your device and backed up automatically to your account.
         </p>
 
         <div className={styles.accountCard}>
@@ -261,7 +261,7 @@ export const SettingsPage: React.FC = () => {
                 {currentUser ? (currentUser.name || 'User Account') : 'Local Guest'}
               </div>
               <div className={styles.accountEmail}>
-                {currentUser ? currentUser.email : `Device: ${deviceId.slice(0, 16)}...`}
+                {currentUser ? currentUser.email : 'Saved on this device · Not signed in'}
               </div>
             </div>
           </div>
@@ -558,7 +558,7 @@ export const SettingsPage: React.FC = () => {
 
       {/* App Info Footer */}
       <footer className={styles.footer}>
-        <span>NextSet · v1.0.0 · Offline-First Progressive Web App</span>
+        <span>NextSet · v1.0.0 · Simple & Reliable Gym Tracker</span>
       </footer>
 
       {/* Auth Modal */}

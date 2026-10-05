@@ -839,17 +839,17 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
             </div>
           )}
 
-          {/* Unique Device Partition Footnote */}
+          {/* Offline Ready Footnote */}
           <div className={styles.partitionCard} style={{ marginTop: 'var(--space-2)' }}>
             <div className={styles.partitionHeader}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                <Smartphone size={14} color="var(--accent-volt)" />
-                <span className={styles.partitionLabel}>Device ID</span>
+                <Smartphone size={14} color="var(--accent-primary, #a78bfa)" />
+                <span className={styles.partitionLabel}>Offline Ready</span>
               </div>
-              <span className={styles.deviceIdBadge}>{deviceId || 'Detecting...'}</span>
+              <span className={styles.deviceIdBadge}>Works without WiFi</span>
             </div>
             <p className={styles.partitionText}>
-              Workouts are saved on this phone first. Sign in to sync across devices.
+              Your workouts are always saved on this device. Sign in anytime to sync across devices and keep a secure backup.
             </p>
           </div>
         </div>
