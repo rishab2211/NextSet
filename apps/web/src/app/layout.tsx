@@ -5,7 +5,7 @@ import '../styles/globals.css';
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'https://nextset-4u3.pages.dev'),
-  title: 'NextSet - Always by your side at the rack.',
+  title: 'NextSet - Your gym companion',
   description: 'Mobile-first, offline-first gym tracking designed for high-stress gym environments with real-time anatomy cues and instant numeric logging.',
   manifest: '/manifest.json',
   icons: {
@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     ],
   },
   openGraph: {
-    title: 'NextSet — High Performance Strength & Hypertrophy PWA',
+    title: 'NextSet - Your gym companion',
     description: 'Mobile-first, offline-first gym tracking designed for high-stress gym environments with real-time anatomy cues and instant numeric logging.',
     url: '/',
     siteName: 'NextSet',
@@ -36,7 +36,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary',
-    title: 'NextSet — High Performance Strength & Hypertrophy PWA',
+    title: 'NextSet - Your gym companion',
     description: 'Mobile-first, offline-first gym tracking designed for high-stress gym environments.',
     images: ['/icons/icon-512.png'],
   },
